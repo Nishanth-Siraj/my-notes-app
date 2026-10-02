@@ -12,7 +12,7 @@
     <div class="meta">
       {% for t in card.tags %}<a class="tag" href="/quiz/cards?tag={{ t }}">{{ t }}</a>{% endfor %}
       <span class="{{ 'due-text' if card.due else 'muted' }}">Next recall: {{ card.due_display }}</span>
-      <span class="muted">Interval {{ card.interval_days }}d · {{ card.reps }} review{{ '' if card.reps == 1 else 's' }} · {{ card.lapses }} wrong</span>
+      <span class="muted">Interval {{ card.interval_days }}d · ease {{ (card.ease * 100)|round|int }}% · {{ card.reps }} review{{ '' if card.reps == 1 else 's' }} · {{ card.lapses }} lapse{{ '' if card.lapses == 1 else 's' }}</span>
     </div>
   </div>
   <div class="actions">

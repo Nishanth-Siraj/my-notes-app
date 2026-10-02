@@ -438,6 +438,7 @@ def list_images(db: Session = Depends(get_db)):
 import quiz  # noqa: E402  (needs the names above)
 app.include_router(quiz.router)
 Base.metadata.create_all(engine)
+quiz.migrate(engine)
 
 
 if __name__ == "__main__":

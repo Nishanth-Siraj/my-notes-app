@@ -389,3 +389,38 @@ h1 { margin: 0; font-size: 1.6rem; line-height: 1.25; }
 
 .relearn-badge { background: var(--danger); color: #fff; font-size: .72rem; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
 .stat.warn .n { color: var(--danger); }
+
+/* Anki rating buttons */
+.qa-sep { border: 0; border-top: 1px solid var(--border); margin: 14px 0; }
+.review-q { font-size: 1.1rem; }
+.anki-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 18px; }
+.anki {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 10px 6px 8px; border-radius: 10px; border: 2px solid transparent;
+  cursor: pointer; color: #fff; font-weight: 700; min-height: 64px; position: relative;
+}
+.anki .ivl { font-size: .8rem; font-weight: 600; opacity: .9; }
+.anki .lbl { font-size: 1rem; }
+.anki kbd { position: absolute; top: 4px; right: 6px; font-size: .65rem; opacity: .6; font-family: inherit; }
+.anki.again { background: #d13212; }
+.anki.hard  { background: #c77d00; }
+.anki.good  { background: #1d8102; }
+.anki.easy  { background: #0972d3; }
+.anki:hover { filter: brightness(1.08); }
+.anki:active { transform: translateY(1px); }
+.custom-row { display: flex; align-items: center; gap: 8px; margin-top: 12px; flex-wrap: wrap; font-size: .9rem; }
+.custom-row input { width: 84px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); font-size: .95rem; }
+.review-counts { font-size: .9rem; font-weight: 600; }
+.review-counts .c-again { color: var(--danger); }
+.review-counts .c-good { color: #1d8102; }
+.history td.again { color: var(--danger); font-weight: 600; }
+.history td.hard { color: #c77d00; font-weight: 600; }
+.history td.good { color: #1d8102; font-weight: 600; }
+.history td.easy { color: #0972d3; font-weight: 600; }
+.history td.custom { color: var(--muted); font-weight: 600; }
+@media (max-width: 420px) {
+  .anki-row { gap: 6px; }
+  .anki { min-height: 60px; padding: 8px 4px 6px; }
+  .anki .lbl { font-size: .9rem; }
+  .anki kbd { display: none; }
+}
