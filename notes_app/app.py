@@ -24,6 +24,7 @@ import hmac
 import os
 import re
 import secrets
+import sys
 import uuid
 from typing import List, Optional
 
@@ -43,6 +44,9 @@ from starlette.middleware.sessions import SessionMiddleware
 # --------------------------------------------------------------------------- #
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+sys.modules.setdefault("app", sys.modules[__name__])   # so `from app import ...` in quiz.py hits this module
 
 
 def load_dotenv(path):
@@ -110,9 +114,6 @@ class Image(Base):
     size_bytes = Column(Integer, nullable=False)
     note_id = Column(Integer, nullable=True)
     created_at = Column(DateTime, nullable=False, default=utcnow)
-
-
-Base.metadata.create_all(engine)
 
 
 def get_db():
@@ -431,6 +432,13 @@ def list_images(db: Session = Depends(get_db)):
 
 
 # --------------------------------------------------------------------------- #
+# Quiz module (flashcards) + table creation
+# --------------------------------------------------------------------------- #
+
+import quiz  # noqa: E402  (needs the names above)
+app.include_router(quiz.router)
+Base.metadata.create_all(engine)
+
 
 if __name__ == "__main__":
     import uvicorn

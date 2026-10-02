@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% set nav = 'quiz' %}
+{% block title %}Review{% endblock %}
+{% block bodyclass %}page-review{% endblock %}
+
+{% block content %}
+<div class="review-top">
+  <a href="/quiz" class="btn small ghost">&larr; Quiz</a>
+  <div class="review-progress" id="progress">Loading…</div>
+  <div class="review-mode muted">{{ mode }}{% if tag %} · tag: <b>{{ tag }}</b>{% endif %}</div>
+</div>
+
+<div id="loading" class="empty-state">Loading cards…</div>
+
+<div id="done" class="empty-state" hidden>
+  <h2 id="done-title">All done</h2>
+  <p id="done-summary"></p>
+  <div class="quiz-actions center">
+    <a class="btn primary big" id="done-again" href="#" hidden>Retry the wrong ones</a>
+    <a class="btn big" href="/quiz/review?all=1{% if tag %}&tag={{ tag }}{% endif %}">Practice all</a>
+    <a class="btn big ghost" href="/quiz">Back to quiz</a>
+  </div>
+</div>
+
+<section id="card" class="review-card card" hidden>
+  <div class="review-meta">
+    <span class="tags" id="card-tags"></span>
+    <span class="muted" id="card-info"></span>
+    <span class="relearn-badge" id="relearn-badge" hidden>forgotten · answer again</span>
+    <a id="card-edit" href="#" class="muted">edit</a>
+  </div>
+
+  <div class="review-label">Question</div>
+  <div class="markdown-body review-q" id="question"></div>
+
+  <div id="attempt-wrap">
+    <label class="review-label" for="attempt">Your answer <span class="muted">(optional, for comparison)</span></label>
+    <textarea id="attempt" rows="3" placeholder="Type what you recall, then reveal…"></textarea>
+    <button class="btn primary big full" id="btn-reveal">Show answer</button>
+  </div>
+
+  <div id="answer-wrap" hidden>
+    <div class="compare" id="compare" hidden>
+      <div class="review-label">You wrote</div>
+      <pre class="attempt-echo" id="attempt-echo"></pre>
+    </div>
+    <div class="review-label">Answer</div>
+    <div class="markdown-body review-a" id="answer"></div>
+
+    <div class="grade">
+      <div class="grade-col wrong">
+        <div class="grade-title">Wrong <span class="muted">· show again in</span></div>
+        <div class="chips" id="chips-wrong">
+          {% for d in presets_wrong %}<button class="chip-btn" data-days="{{ d }}">{% if d == 0 %}today{% else %}{{ d }}d{% endif %}</button>{% endfor %}
+          <label class="custom"><input type="number" min="0" max="3650" id="custom-wrong" placeholder="days"></label>
+        </div>
+        <button class="btn danger big full" id="btn-wrong">Wrong</button>
+      </div>
+      <div class="grade-col correct">
+        <div class="grade-title">Correct <span class="muted">· recall in</span></div>
+        <div class="chips" id="chips-correct">
+          {% for d in presets_correct %}<button class="chip-btn" data-days="{{ d }}">{{ d }}d</button>{% endfor %}
+          <label class="custom"><input type="number" min="0" max="3650" id="custom-correct" placeholder="days"></label>
+        </div>
+        <button class="btn success big full" id="btn-correct">Correct</button>
+      </div>
+    </div>
+    <div class="muted hint">Recommended intervals are preselected. A wrong card comes back later in this session until you get it right. Keys: <kbd>Space</kbd> reveal · <kbd>1</kbd> wrong · <kbd>2</kbd> correct</div>
+  </div>
+</section>
+
+<script id="review-config" type="application/json">{{ {"tag": tag, "all": all, "forgotten": forgotten}|tojson }}</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='quiz_review.js') }}"></script>
+{% endblock %}

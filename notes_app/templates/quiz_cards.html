@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set nav = 'quiz' %}
+{% block title %}Cards{% endblock %}
+{% block bodyclass %}page-quiz{% endblock %}
+
+{% block content %}
+<nav class="crumbs"><a href="/quiz">Quiz</a> <span>/</span> <span>Cards</span></nav>
+<div class="page-head">
+  <div>
+    <h1>Cards</h1>
+    <p class="muted">{{ cards|length }} card{{ '' if cards|length == 1 else 's' }}{% if due_only %} due{% endif %}{% if q %} matching “{{ q }}”{% endif %}{% if active_tag %} tagged <b>{{ active_tag }}</b>{% endif %}</p>
+  </div>
+  <a href="/quiz/cards/new" class="btn primary">+ New card</a>
+</div>
+
+<form class="filters" method="get" action="/quiz/cards">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search question, answer or tags…" autocomplete="off">
+  {% if active_tag %}<input type="hidden" name="tag" value="{{ active_tag }}">{% endif %}
+  <label class="check"><input type="checkbox" name="due" value="1" {% if due_only %}checked{% endif %} onchange="this.form.submit()"> due only</label>
+  <button class="btn" type="submit">Search</button>
+  {% if q or active_tag or due_only %}<a class="btn ghost" href="/quiz/cards">Clear</a>{% endif %}
+</form>
+
+{% if tags %}
+<div class="tag-row">
+  {% for t in tags %}
+  <a class="chip {% if t.tag == active_tag %}active{% endif %}" href="/quiz/cards?tag={{ '' if t.tag == active_tag else t.tag }}{% if q %}&q={{ q }}{% endif %}{% if due_only %}&due=1{% endif %}">{{ t.tag }} <span>{{ t.count }}</span></a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if cards %}
+<ul class="card-list">
+  {% for c in cards %}
+  <li>
+    <a class="card-row" href="/quiz/cards/{{ c.id }}">
+      <span class="dot {{ 'due' if c.due else 'later' }}" title="{{ c.due_display }}"></span>
+      <span class="q">{{ c.preview or '(empty question)' }}</span>
+      <span class="when {{ 'due' if c.due else '' }}">{{ c.due_display }}</span>
+      <span class="tags">{% for t in c.tags %}<span class="tag">{{ t }}</span>{% endfor %}</span>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<div class="empty-state">
+  <p>{% if q or active_tag or due_only %}No cards match.{% else %}No cards yet.{% endif %}</p>
+  <a href="/quiz/cards/new" class="btn primary">Create a card</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -61,4 +61,8 @@ cd notes_app
 ../.venv/bin/uvicorn app:app --reload --port 8000     # http://127.0.0.1:8000
 ```
 
+### Quiz (flashcards)
+
+Open `/quiz`. Cards have a Markdown question and answer (text, code blocks, images). Review flow: read the question, optionally type your answer, reveal, then grade yourself as Wrong or Correct and pick when to see the card again (1/3/7/14/30 days, or a custom number). Anki-style behaviour: a wrong card comes back later in the same session until you answer it correctly, keeps a short interval afterwards, and intervals grow about 2.5x on each correct answer. The dashboard shows due, forgotten and new counts and offers "Relearn forgotten" and "Practice all" modes.
+
 Locally it uses `notes_app/notes.db` (SQLite). For hosting, set `DATABASE_URL` to a free Postgres (Neon or Supabase) and `NOTES_PASSWORD`. See [notes_app/DEPLOY.md](notes_app/DEPLOY.md).

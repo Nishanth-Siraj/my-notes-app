@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% set nav = 'quiz' %}
+{% block title %}Quiz{% endblock %}
+{% block bodyclass %}page-quiz{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Quiz</h1>
+    <p class="muted">Flashcards with spaced recall. Answer, reveal, grade yourself, pick when to see it again.</p>
+  </div>
+</div>
+
+<div class="stat-row">
+  <div class="stat"><div class="n">{{ stats.due }}</div><div class="l">due now</div></div>
+  <div class="stat"><div class="n">{{ stats.due_tomorrow }}</div><div class="l">due tomorrow</div></div>
+  <div class="stat {{ 'warn' if stats.forgotten else '' }}"><div class="n">{{ stats.forgotten }}</div><div class="l">forgotten</div></div>
+  <div class="stat"><div class="n">{{ stats.new }}</div><div class="l">never reviewed</div></div>
+  <div class="stat"><div class="n">{{ stats.total }}</div><div class="l">total cards</div></div>
+  <div class="stat"><div class="n">{{ stats.reviewed_today }}</div><div class="l">reviewed today</div></div>
+  <div class="stat"><div class="n">{{ stats.wrong_today }}</div><div class="l">wrong today</div></div>
+</div>
+
+<div class="quiz-actions">
+  {% if stats.due %}
+  <a class="btn primary big" href="/quiz/review">Review {{ stats.due }} due card{{ '' if stats.due == 1 else 's' }}</a>
+  {% else %}
+  <span class="btn big disabled">Nothing due right now</span>
+  {% endif %}
+  {% if stats.forgotten %}<a class="btn big danger" href="/quiz/review?forgotten=1">Relearn {{ stats.forgotten }} forgotten</a>{% endif %}
+  <a class="btn big" href="/quiz/review?all=1">Practice all cards</a>
+  <a class="btn big" href="/quiz/cards/new">+ New card</a>
+  <a class="btn big ghost" href="/quiz/cards">Browse cards</a>
+</div>
+
+{% if tags %}
+<h2 class="section-h">Review by tag</h2>
+<div class="tag-row">
+  {% for t in tags %}
+  <a class="chip" href="/quiz/review?tag={{ t.tag }}&all=1">{{ t.tag }} <span>{{ t.count }}</span></a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if stats.total == 0 %}
+<div class="empty-state">
+  <p>No cards yet. Add a question with text, code or an image, and its answer.</p>
+  <a class="btn primary" href="/quiz/cards/new">Create your first card</a>
+</div>
+{% endif %}
+{% endblock %}

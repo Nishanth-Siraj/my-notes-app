@@ -15,8 +15,13 @@
   <div class="topbar-inner">
     <a class="brand" href="/">Notes</a>
     <nav class="topnav">
-      <a href="/" class="navlink">All notes</a>
-      <a href="/notes/new" class="btn primary small">+ New note</a>
+      <a href="/" class="navlink {% if nav == 'notes' %}active{% endif %}">Notes</a>
+      <a href="/quiz" class="navlink {% if nav == 'quiz' %}active{% endif %}">Quiz</a>
+      {% if nav == 'quiz' %}
+      <a href="/quiz/cards/new" class="btn primary small">+ Card</a>
+      {% else %}
+      <a href="/notes/new" class="btn primary small">+ Note</a>
+      {% endif %}
       {% if has_password %}
       <form method="post" action="/logout" class="inline"><button class="btn small ghost" type="submit">Log out</button></form>
       {% endif %}
