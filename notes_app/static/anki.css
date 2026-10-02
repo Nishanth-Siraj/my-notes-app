@@ -327,3 +327,25 @@ table.counts-table td.n { text-align: right; font-variant-numeric: tabular-nums;
   .anki-main.with-bottombar { padding-bottom: 150px; }
   .reviewer-bar { padding: 8px 8px 10px; }
 }
+
+/* ---------- never exceed the screen: page is clamped, wide elements scroll sideways ---------- */
+html, body.anki { max-width: 100vw; overflow-x: hidden; }
+.anki-main { overflow-x: auto; min-width: 0; }                /* anything wider than the screen scrolls here */
+.heatmap-wrap, .table-wrap, .hm-scroll, .qa, .add-dialog { max-width: 100%; min-width: 0; }
+.markdown-body { overflow-x: auto; }                          /* wide tables / long lines in cards */
+.markdown-body img { max-width: 100%; }
+table.decks, table.overview-counts, table.info, table.log, table.counts-table { max-width: 100%; }
+.bars { max-width: 100%; }
+@media (max-width: 640px) {
+  .tb-center { overflow-x: auto; white-space: nowrap; max-width: 100%; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .tb-center::-webkit-scrollbar { display: none; }
+  .bottombar { flex-wrap: nowrap; overflow-x: auto; justify-content: safe center; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+  .bottombar > * { flex: 0 0 auto; }
+  .reviewer-bar { display: flex; flex-direction: column; align-items: stretch; overflow: visible; }
+  .reviewer-bar .bar-left, .reviewer-bar .bar-right { justify-content: center; }
+  .answer-buttons { overflow-x: auto; }
+  .anki-main.with-bottombar { padding-bottom: 130px; }
+  .hm-summary { gap: 4px 16px; }
+  .browse-search { overflow-x: auto; flex-wrap: nowrap; }
+  .browse-search input[type=search] { flex: 1 0 200px; }
+}
