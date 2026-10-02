@@ -424,3 +424,18 @@ h1 { margin: 0; font-size: 1.6rem; line-height: 1.25; }
   .anki .lbl { font-size: .9rem; }
   .anki kbd { display: none; }
 }
+
+/* compact quiz dashboard */
+.page-head.compact { margin-bottom: 10px; display: block; }
+.page-head.compact .intro { margin: 2px 0 0; font-size: .9rem; }
+.quiz-actions { margin: 0 0 14px; }
+.stat-row { grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 6px; }
+.stat { padding: 8px 6px; text-decoration: none; color: inherit; }
+.stat .n { font-size: 1.35rem; }
+.stat .l { font-size: .72rem; }
+.today { font-size: .85rem; margin: 0 0 6px; }
+@media (max-width: 640px) {
+  .page-head.compact .intro { display: none; }
+  .quiz-actions .btn.big { padding: 12px 14px; }
+  .quiz-actions .btn:not(.primary):not(.danger) { flex-basis: calc(50% - 5px); }
+}

@@ -130,7 +130,7 @@ def get_db():
 # App + auth
 # --------------------------------------------------------------------------- #
 
-app = FastAPI(title="Notes", docs_url=None, redoc_url=None)
+app = FastAPI(title="Azazel", docs_url=None, redoc_url=None)
 app.add_middleware(
     SessionMiddleware, secret_key=SECRET, max_age=30 * 24 * 3600, same_site="lax"
 )
