@@ -28,7 +28,7 @@ jobs:
           fi
           code=$(curl -s -o /tmp/hook.json -w '%{http_code}' -X POST "$HOOK")
           echo "Render responded $code"; cat /tmp/hook.json; echo
-          [ "$code" = "200" ] || [ "$code" = "201" ]
+          case "$code" in 2??) ;; *) echo "::error::Deploy hook rejected (HTTP $code)"; exit 1;; esac
 
       - name: Wait until this commit is live
         env:
