@@ -265,12 +265,13 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
   table.browse { font-size: 12px; }
 }
 
-/* ---------- review heatmap (Review Heatmap add-on look, gold palette, pale yellow -> bright gold (no brown/red)) ---------- */
-:root { --hm0: #ebedf0; --hm1: #fff3bf; --hm2: #ffe066; --hm3: #ffd43b; --hm4: #fab005;
+/* ---------- review heatmap (Review Heatmap add-on look, glow palette: pale yellow -> yellow -> orange-yellow (no red)) ---------- */
+:root { --hm0: #ebedf0; --hm1: #fff9c4; --hm2: #ffee58; --hm3: #ffc928; --hm4: #ff9f1a;
         --hmf0: #ebedf0; --hmf1: #bae6fd; --hmf2: #7dd3fc; --hmf3: #38bdf8; --hmf4: #0284c7; }
 @media (prefers-color-scheme: dark) {
-  :root { --hm0: #30363d; --hm1: #5c4d0a; --hm2: #8a7312; --hm3: #c9a81c; --hm4: #ffd43b;
+  :root { --hm0: #30363d; --hm1: #6a5f10; --hm2: #b3a018; --hm3: #ffd23a; --hm4: #ffa726;
           --hmf0: #30363d; --hmf1: #0c4a6e; --hmf2: #075985; --hmf3: #0284c7; --hmf4: #38bdf8; }
+}
 }
 }
 }
