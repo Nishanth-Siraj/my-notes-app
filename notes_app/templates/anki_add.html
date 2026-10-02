@@ -1,0 +1,62 @@
+{% extends "anki_base.html" %}
+{% block title %}{% if mode == 'add' %}Add{% else %}Edit{% endif %}{% endblock %}
+{% block nav_add %}{% if mode == 'add' %}current{% endif %}{% endblock %}
+{% block bodyclass %}addcards{% endblock %}
+{% block mainclass %}with-bottombar{% endblock %}
+
+{% block content %}
+<div class="add-dialog">
+  <div class="type-deck">
+    <label>Type <span class="abtn static">Basic</span></label>
+    <label>Deck
+      <select id="deck">
+        {% for d in decks %}<option value="{{ d }}" {% if d == deck %}selected{% endif %}>{{ d }}</option>{% endfor %}
+        <option value="__new__">New deck…</option>
+      </select>
+    </label>
+  </div>
+
+  {% for field, label in [('question', 'Front'), ('answer', 'Back')] %}
+  <div class="field" data-field="{{ field }}">
+    <div class="field-label">
+      <span>{{ label }}</span>
+      <span class="fmt">
+        <button type="button" data-act="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+        <button type="button" data-act="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+        <button type="button" data-act="code" title="Inline code">&lt;/&gt;</button>
+        <button type="button" data-act="codeblock" title="Code block">{ }</button>
+        <select class="lang" title="Code block language">
+          <option value="">text</option><option value="python" selected>python</option><option value="bash">bash</option>
+          <option value="json">json</option><option value="yaml">yaml</option><option value="sql">sql</option>
+          <option value="javascript">javascript</option><option value="html">html</option>
+        </select>
+        <button type="button" data-act="image" title="Attach picture (paste or drop also works)">&#128444;</button>
+        <input type="file" accept="image/*" multiple hidden class="file">
+        <button type="button" data-act="preview" title="Preview">&#128065;</button>
+      </span>
+    </div>
+    <textarea id="{{ field }}" rows="5" spellcheck="false">{{ card[field] if card else '' }}</textarea>
+    <div class="markdown-body preview" hidden></div>
+  </div>
+  {% endfor %}
+
+  <div class="field tags-field">
+    <div class="field-label"><span>Tags</span></div>
+    <input type="text" id="tags" value="{{ card.tags|join(' ') if card else '' }}" placeholder="space or comma separated">
+  </div>
+</div>
+
+<script id="card-data" type="application/json">{{ (card or {})|tojson }}</script>
+{% endblock %}
+
+{% block bottombar %}
+<div class="bottombar">
+  <button type="button" class="abtn primary" id="btn-save">{% if mode == 'add' %}Add{% else %}Save{% endif %} <kbd>Ctrl+Enter</kbd></button>
+  {% if mode == 'edit' %}<a class="abtn" href="/quiz/cards/{{ card.id }}">Card Info</a>{% endif %}
+  <a class="abtn" href="{% if mode == 'add' %}/quiz{% else %}/quiz/cards/{{ card.id }}{% endif %}" id="btn-close">Close</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='anki_add.js') }}"></script>
+{% endblock %}

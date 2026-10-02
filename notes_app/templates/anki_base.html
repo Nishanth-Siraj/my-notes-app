@@ -3,37 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Azazel{% endblock %}</title>
+  <title>{% block title %}Anki{% endblock %} · Azazel</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" media="(prefers-color-scheme: light)">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
-  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
-  {% block head %}{% endblock %}
+  <link rel="stylesheet" href="{{ url_for('static', path='anki.css') }}">
 </head>
-<body class="{% block bodyclass %}{% endblock %}">
+<body class="anki {% block bodyclass %}{% endblock %}">
 
-<header class="topbar">
-  <div class="topbar-inner">
-    <a class="brand" href="/">Azazel</a>
-    <nav class="topnav">
-      <a href="/" class="navlink {% if nav == 'notes' %}active{% endif %}">Notes</a>
-      <a href="/quiz" class="navlink {% if nav == 'quiz' %}active{% endif %}">Quiz</a>
-      {% if nav == 'quiz' %}
-      <a href="/quiz/add" class="btn primary small">+ Card</a>
-      {% else %}
-      <a href="/notes/new" class="btn primary small">+ Note</a>
-      {% endif %}
-      {% if has_password %}
-      <form method="post" action="/logout" class="inline"><button class="btn small ghost" type="submit">Log out</button></form>
-      {% endif %}
-    </nav>
+<!-- Anki main toolbar: Decks · Add · Browse -->
+<div class="toolbar">
+  <a class="tb-side left" href="/" title="Back to notes">Azazel</a>
+  <nav class="tb-center">
+    <a href="/quiz" class="{% block nav_decks %}{% endblock %}">Decks</a>
+    <a href="/quiz/add" class="{% block nav_add %}{% endblock %}">Add</a>
+    <a href="/quiz/browse" class="{% block nav_browse %}{% endblock %}">Browse</a>
+    <a href="/quiz/stats" class="{% block nav_stats %}{% endblock %}">Stats</a>
+  </nav>
+  <div class="tb-side right">
+    <a href="/">Notes</a>
+    {% if has_password %}<form method="post" action="/logout" class="inline"><button type="submit" class="linkbtn">Log out</button></form>{% endif %}
   </div>
-</header>
+</div>
 
-<main class="container {% block containerclass %}{% endblock %}">
+<main class="anki-main {% block mainclass %}{% endblock %}">
   {% block content %}{% endblock %}
 </main>
 
-<!-- Image viewer -->
+{% block bottombar %}{% endblock %}
+
+<!-- Image viewer (shared with notes) -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
   <div class="lb-bar">
     <div class="lb-title" id="lb-title"></div>
@@ -48,7 +46,6 @@
   <div class="lb-stage" id="lb-stage"><img id="lb-img" src="" alt="" draggable="false"></div>
   <div class="lb-foot">Scroll to zoom &middot; drag to pan &middot; double-click to toggle &middot; Esc to close</div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>

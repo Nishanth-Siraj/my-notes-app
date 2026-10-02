@@ -1,0 +1,54 @@
+{% extends "anki_base.html" %}
+{% block title %}Browse{% endblock %}
+{% block nav_browse %}current{% endblock %}
+{% block bodyclass %}browser{% endblock %}
+
+{% block content %}
+<form class="browse-search" method="get" action="/quiz/browse">
+  <select name="deck" onchange="this.form.submit()">
+    <option value="">All decks</option>
+    {% for d in decks %}<option value="{{ d }}" {% if d == deck %}selected{% endif %}>{{ d }}</option>{% endfor %}
+  </select>
+  <input type="search" name="q" value="{{ q }}" placeholder="Search cards (type text, then press Enter)" autocomplete="off">
+  {% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
+  <label class="chk"><input type="checkbox" name="due" value="1" {% if due_only %}checked{% endif %} onchange="this.form.submit()"> is:due</label>
+  <button class="abtn" type="submit">Search</button>
+</form>
+
+<p class="muted small">{{ cards|length }} card{{ '' if cards|length == 1 else 's' }}{% if deck %} in {{ deck }}{% endif %}{% if q %} matching “{{ q }}”{% endif %}{% if tag %} tagged {{ tag }}{% endif %}{% if due_only %} that are due{% endif %}</p>
+
+{% if cards %}
+<div class="table-wrap">
+<table class="browse">
+  <thead>
+    <tr><th>Sort Field</th><th>Deck</th><th>Due</th><th>Interval</th><th>Ease</th><th>Reviews</th><th>Lapses</th><th>Tags</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for c in cards %}
+    <tr class="row {{ c.queue }}" data-href="/quiz/cards/{{ c.id }}/edit">
+      <td class="sf">{{ c.sort_field or '(empty)' }}</td>
+      <td>{{ c.deck }}</td>
+      <td class="{{ c.queue if c.due else '' }}">{{ c.due_display }}</td>
+      <td>{% if c.interval_days %}{{ c.interval_days }}d{% else %}(new){% endif %}</td>
+      <td>{{ (c.ease * 100)|round|int }}%</td>
+      <td>{{ c.reps }}</td>
+      <td>{{ c.lapses }}</td>
+      <td class="tags">{{ c.tags|join(' ') }}</td>
+      <td class="info"><a href="/quiz/cards/{{ c.id }}" title="Card Info">info</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="center muted">No cards match.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('tr.row[data-href]').forEach(function (r) {
+  r.addEventListener('click', function (e) { if (!e.target.closest('a')) location.href = r.dataset.href; });
+});
+</script>
+{% endblock %}

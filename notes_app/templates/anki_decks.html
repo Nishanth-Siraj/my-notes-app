@@ -1,0 +1,69 @@
+{% extends "anki_base.html" %}
+{% block title %}Decks{% endblock %}
+{% block nav_decks %}current{% endblock %}
+{% block bodyclass %}deckbrowser{% endblock %}
+
+{% block content %}
+<table class="decks" id="decks">
+  <thead>
+    <tr><th class="name">Deck</th><th class="count">New</th><th class="count">Learn</th><th class="count">Due</th><th class="gear"></th></tr>
+  </thead>
+  <tbody>
+  {% for d in decks %}
+    <tr>
+      <td class="name"><a class="deck" href="/quiz/deck/{{ d.name }}">{{ d.name }}</a></td>
+      <td class="count"><span class="new {{ 'zero' if d.new == 0 }}">{{ d.new }}</span></td>
+      <td class="count"><span class="learn {{ 'zero' if d.learn == 0 }}">{{ d.learn }}</span></td>
+      <td class="count"><span class="review {{ 'zero' if d.due == 0 }}">{{ d.due }}</span></td>
+      <td class="gear">
+        <details class="menu">
+          <summary title="Options">&#9881;</summary>
+          <div class="menu-items">
+            <a href="/quiz/add?deck={{ d.name }}">Add cards</a>
+            <a href="/quiz/browse?deck={{ d.name }}">Browse</a>
+            {% if d.name != 'Default' %}<button type="button" class="danger" data-delete-deck="{{ d.name }}" data-count="{{ d.total }}">Delete</button>{% endif %}
+          </div>
+        </details>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% else %}No cards have been studied today.{% endif %}</p>
+
+<div class="deck-buttons">
+  <button type="button" class="abtn" id="btn-create-deck">Create Deck</button>
+  <a class="abtn" href="/quiz/add">Add</a>
+</div>
+
+<!-- Review heatmap (like the Review Heatmap add-on on Anki's deck screen) -->
+<section class="heatmap-wrap" id="heatmap" data-days="365"></section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='anki_heatmap.js') }}"></script>
+<script>
+(function () {
+  var N = window.Notes;
+  document.getElementById('btn-create-deck').addEventListener('click', function () {
+    var name = prompt('New deck name:');
+    if (!name || !name.trim()) return;
+    N.api('POST', '/api/decks', { name: name.trim() }).then(function () { location.reload(); })
+      .catch(function (e) { N.toast(e.message, true); });
+  });
+  document.querySelectorAll('[data-delete-deck]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var n = b.dataset.deleteDeck, c = parseInt(b.dataset.count, 10) || 0;
+      if (!confirm('Delete deck "' + n + '"' + (c ? ' and its ' + c + ' card' + (c === 1 ? '' : 's') : '') + '?')) return;
+      N.api('DELETE', '/api/decks/' + encodeURIComponent(n)).then(function () { location.reload(); })
+        .catch(function (e) { N.toast(e.message, true); });
+    });
+  });
+  // close any open gear menu when clicking elsewhere
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('details.menu[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
+  });
+})();
+</script>
+{% endblock %}

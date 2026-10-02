@@ -41,9 +41,20 @@ RELEARN_MINUTES = 10    # Anki learning step
 # Models
 # --------------------------------------------------------------------------- #
 
+DEFAULT_DECK = "Default"
+
+
+class Deck(Base):
+    __tablename__ = "decks"
+    id = Column(Integer, primary_key=True)
+    name = Column(String(200), nullable=False, unique=True)
+    created_at = Column(DateTime, nullable=False, default=utcnow)
+
+
 class Card(Base):
     __tablename__ = "cards"
     id = Column(Integer, primary_key=True)
+    deck = Column(String(200), nullable=False, default=DEFAULT_DECK, index=True)
     question = Column(Text, nullable=False, default="")
     answer = Column(Text, nullable=False, default="")
     tags = Column(String(500), nullable=False, default="")
@@ -76,6 +87,10 @@ def migrate(engine):
     with engine.begin() as conn:
         if "ease" not in cols:
             conn.execute(text(f"ALTER TABLE cards ADD COLUMN ease FLOAT NOT NULL DEFAULT {EASE_START}"))
+        if "deck" not in cols:
+            conn.execute(text(f"ALTER TABLE cards ADD COLUMN deck VARCHAR(200) NOT NULL DEFAULT '{DEFAULT_DECK}'"))
+        if not conn.execute(text("SELECT 1 FROM decks WHERE name = :n"), {"n": DEFAULT_DECK}).first():
+            conn.execute(text("INSERT INTO decks (name, created_at) VALUES (:n, :t)"), {"n": DEFAULT_DECK, "t": utcnow()})
         conn.execute(text("UPDATE cards SET last_result='again' WHERE last_result='wrong'"))
         conn.execute(text("UPDATE cards SET last_result='good'  WHERE last_result='correct'"))
         conn.execute(text("UPDATE card_reviews SET result='again' WHERE result='wrong'"))
@@ -151,6 +166,8 @@ def card_out(c: Card, with_content=True):
     delta = c.due_at - now
     d = {
         "id": c.id,
+        "deck": c.deck or DEFAULT_DECK,
+        "queue": "new" if c.reps == 0 else ("learn" if is_learning(c) else "review"),
         "tags": [t for t in c.tags.split(",") if t],
         "due_at": c.due_at.isoformat() + "Z",
         "due": c.due_at <= now,
@@ -174,8 +191,15 @@ def card_out(c: Card, with_content=True):
     return d
 
 
-def query_cards(db: Session, q: str = "", tag: str = "", due_only=False, forgotten=False):
+def norm_deck(name) -> str:
+    name = " ".join(str(name or "").split())
+    return name or DEFAULT_DECK
+
+
+def query_cards(db: Session, q: str = "", tag: str = "", due_only=False, forgotten=False, deck: str = ""):
     query = db.query(Card)
+    if deck:
+        query = query.filter(Card.deck == deck)
     if forgotten:
         query = query.filter(Card.last_result == "again")
     q, tag = q.strip(), tag.strip().lower()
@@ -195,6 +219,25 @@ def card_tag_counts(db: Session):
         for t in tags.split(","):
             counts[t] = counts.get(t, 0) + 1
     return sorted(({"tag": k, "count": v} for k, v in counts.items()), key=lambda x: (-x["count"], x["tag"]))
+
+
+def deck_counts(db: Session):
+    """Anki deck list numbers. new: never studied & due; learn: (re)learning & due; due: review cards due."""
+    now = utcnow()
+    names = {d.name for d in db.query(Deck).all()} | {c[0] for c in db.query(Card.deck).distinct().all() if c[0]}
+    names.add(DEFAULT_DECK)
+    rows = {n: {"name": n, "new": 0, "learn": 0, "due": 0, "total": 0} for n in names}
+    for c in db.query(Card).all():
+        r = rows.setdefault(c.deck or DEFAULT_DECK, {"name": c.deck, "new": 0, "learn": 0, "due": 0, "total": 0})
+        r["total"] += 1
+        if c.due_at <= now:
+            if c.reps == 0:
+                r["new"] += 1
+            elif is_learning(c):
+                r["learn"] += 1
+            else:
+                r["due"] += 1
+    return sorted(rows.values(), key=lambda r: (r["name"] != DEFAULT_DECK, r["name"].lower()))
 
 
 def stats(db: Session):
@@ -223,7 +266,12 @@ class CardIn(BaseModel):
     question: Optional[str] = None
     answer: Optional[str] = None
     tags: Optional[object] = None
+    deck: Optional[str] = None
     due_in_days: Optional[int] = None
+
+
+class DeckIn(BaseModel):
+    name: str
 
 
 class ReviewIn(BaseModel):
@@ -232,21 +280,115 @@ class ReviewIn(BaseModel):
 
 
 @router.get("/api/cards")
-def list_cards(q: str = "", tag: str = "", due: int = 0, db: Session = Depends(get_db)):
-    return [card_out(c, with_content=False) for c in query_cards(db, q, tag, bool(due))]
+def list_cards(q: str = "", tag: str = "", due: int = 0, deck: str = "", db: Session = Depends(get_db)):
+    return [card_out(c, with_content=False) for c in query_cards(db, q, tag, bool(due), deck=deck)]
+
+
+@router.get("/api/decks")
+def list_decks(db: Session = Depends(get_db)):
+    return deck_counts(db)
+
+
+@router.post("/api/decks", status_code=201)
+def create_deck(body: DeckIn, db: Session = Depends(get_db)):
+    name = norm_deck(body.name)
+    if db.query(Deck).filter(Deck.name == name).first():
+        raise HTTPException(409, "deck already exists")
+    db.add(Deck(name=name))
+    db.commit()
+    return {"name": name}
+
+
+@router.delete("/api/decks/{name}")
+def delete_deck(name: str, db: Session = Depends(get_db)):
+    """Anki deletes the cards with the deck. The Default deck cannot be deleted."""
+    if name == DEFAULT_DECK:
+        raise HTTPException(400, "the Default deck cannot be deleted")
+    ids = [c.id for c in db.query(Card).filter(Card.deck == name).all()]
+    if ids:
+        db.query(Review).filter(Review.card_id.in_(ids)).delete(synchronize_session=False)
+        db.query(Card).filter(Card.deck == name).delete(synchronize_session=False)
+    db.query(Deck).filter(Deck.name == name).delete(synchronize_session=False)
+    db.commit()
+    return {"deleted": name, "cards": len(ids)}
 
 
 @router.get("/api/cards/due")
-def due_cards(tag: str = "", all: int = 0, forgotten: int = 0, limit: int = 200, db: Session = Depends(get_db)):
-    """Session queue. Lapsed (relearning) cards come first, like Anki's learning queue."""
-    cards = query_cards(db, "", tag, due_only=not (all or forgotten), forgotten=bool(forgotten))[:limit]
-    cards.sort(key=lambda c: (0 if c.last_result == "again" else 1, c.due_at, c.id))
+def due_cards(tag: str = "", deck: str = "", all: int = 0, forgotten: int = 0, limit: int = 200,
+              db: Session = Depends(get_db)):
+    """Study queue in Anki's order: learning cards, then due reviews, then new cards."""
+    cards = query_cards(db, "", tag, due_only=not (all or forgotten), forgotten=bool(forgotten), deck=deck)[:limit]
+    def order(c):
+        if c.reps > 0 and is_learning(c):
+            return (0, c.due_at, c.id)
+        if c.reps > 0:
+            return (1, c.due_at, c.id)
+        return (2, c.id, c.id)
+    cards.sort(key=order)
     return [card_out(c) for c in cards]
 
 
 @router.get("/api/quiz/stats")
 def quiz_stats(db: Session = Depends(get_db)):
     return stats(db)
+
+
+@router.get("/api/quiz/heatmap")
+def heatmap(days: int = 365, tz: int = 0, db: Session = Depends(get_db)):
+    """
+    Reviews per calendar day for the heatmap, plus streaks. `tz` is the browser's
+    timezone offset in minutes as JS reports it (IST = -330), so days are local days.
+    """
+    days = max(7, min(730, days))
+    shift = datetime.timedelta(minutes=-tz)
+    now_local = utcnow() + shift
+    today = now_local.date()
+    start_local = datetime.datetime.combine(today - datetime.timedelta(days=days - 1), datetime.time.min)
+    rows = db.query(Review.reviewed_at).filter(Review.reviewed_at >= start_local - shift).all()
+    per_day = {}
+    for (ts,) in rows:
+        d = (ts + shift).date().isoformat()
+        per_day[d] = per_day.get(d, 0) + 1
+    # streaks over the whole history (not just the window)
+    all_days = sorted({(ts + shift).date() for (ts,) in db.query(Review.reviewed_at).all()})
+    longest = cur = 0
+    prev = None
+    for d in all_days:
+        cur = cur + 1 if prev is not None and (d - prev).days == 1 else 1
+        longest = max(longest, cur)
+        prev = d
+    current = 0
+    if all_days:
+        d = today if today in set(all_days) else today - datetime.timedelta(days=1)
+        s_all = set(all_days)
+        while d in s_all:
+            current += 1
+            d -= datetime.timedelta(days=1)
+    total_in_window = sum(per_day.values())
+    active = len(per_day)
+    return {
+        "start": start_local.date().isoformat(), "end": today.isoformat(), "days": per_day,
+        "streak_current": current, "streak_longest": longest,
+        "days_learned": active, "days_learned_pct": round(100 * active / days),
+        "total": total_in_window, "avg_active_day": round(total_in_window / active, 1) if active else 0,
+        "avg_day": round(total_in_window / days, 1),
+    }
+
+
+@router.get("/api/quiz/future")
+def future_due(days: int = 30, tz: int = 0, db: Session = Depends(get_db)):
+    """Cards becoming due per local day for the next N days (overdue counted on day 0)."""
+    days = max(7, min(365, days))
+    shift = datetime.timedelta(minutes=-tz)
+    today = (utcnow() + shift).date()
+    buckets = [0] * days
+    for (due,) in db.query(Card.due_at).all():
+        offset = ((due + shift).date() - today).days
+        if offset < 0:
+            offset = 0
+        if offset < days:
+            buckets[offset] += 1
+    return {"start": today.isoformat(), "counts": buckets}
 
 
 @router.get("/api/quiz/tags")
@@ -258,7 +400,10 @@ def quiz_tags(db: Session = Depends(get_db)):
 def create_card(body: CardIn, db: Session = Depends(get_db)):
     if not (body.question or "").strip():
         raise HTTPException(400, "question is required")
-    c = Card(question=body.question.strip(), answer=(body.answer or "").strip(), tags=norm_tags(body.tags))
+    c = Card(question=body.question.strip(), answer=(body.answer or "").strip(), tags=norm_tags(body.tags),
+             deck=norm_deck(body.deck))
+    if not db.query(Deck).filter(Deck.name == c.deck).first():
+        db.add(Deck(name=c.deck))
     if body.due_in_days:
         c.due_at = utcnow() + datetime.timedelta(days=max(0, body.due_in_days))
     db.add(c)
@@ -293,6 +438,10 @@ def update_card(card_id: int, body: CardIn, db: Session = Depends(get_db)):
         c.answer = body.answer.strip()
     if body.tags is not None:
         c.tags = norm_tags(body.tags)
+    if body.deck is not None:
+        c.deck = norm_deck(body.deck)
+        if not db.query(Deck).filter(Deck.name == c.deck).first():
+            db.add(Deck(name=c.deck))
     if body.due_in_days is not None:
         c.due_at = utcnow() + datetime.timedelta(days=max(0, body.due_in_days))
     c.updated_at = utcnow()
@@ -345,55 +494,93 @@ def reset_card(card_id: int, db: Session = Depends(get_db)):
 
 
 # --------------------------------------------------------------------------- #
-# Pages
+# Pages (Anki screens: Decks, Overview, Reviewer, Add, Browse, Card Info)
 # --------------------------------------------------------------------------- #
 
 @router.get("/quiz", response_class=HTMLResponse)
-def quiz_home(request: Request, db: Session = Depends(get_db)):
-    return render(request, "quiz_home.html", stats=stats(db), tags=card_tag_counts(db))
+def decks_page(request: Request, db: Session = Depends(get_db)):
+    return render(request, "anki_decks.html", decks=deck_counts(db), stats=stats(db), nav="quiz")
+
+
+@router.get("/quiz/stats", response_class=HTMLResponse)
+def stats_page(request: Request, db: Session = Depends(get_db)):
+    now = utcnow()
+    counts = {
+        "new": db.query(Card).filter(Card.reps == 0).count(),
+        "learning": db.query(Card).filter(Card.reps > 0, Card.last_result == "again").count(),
+        "young": db.query(Card).filter(Card.reps > 0, Card.last_result != "again", Card.interval_days < 21).count(),
+        "mature": db.query(Card).filter(Card.reps > 0, Card.last_result != "again", Card.interval_days >= 21).count(),
+        "total": db.query(Card).count(),
+        "reviews_total": db.query(Review).count(),
+    }
+    return render(request, "anki_stats.html", counts=counts, nav="quiz")
+
+
+@router.get("/quiz/deck/{name}", response_class=HTMLResponse)
+def overview_page(request: Request, name: str, db: Session = Depends(get_db)):
+    row = next((d for d in deck_counts(db) if d["name"] == name), None)
+    if row is None:
+        raise HTTPException(404, "deck not found")
+    return render(request, "anki_overview.html", deck=row, nav="quiz")
 
 
 @router.get("/quiz/review", response_class=HTMLResponse)
-def quiz_review(request: Request, tag: str = "", all: int = 0, forgotten: int = 0):
-    mode = "forgotten cards" if forgotten else ("all cards" if all else "due cards")
-    return render(request, "quiz_review.html", tag=tag, all=bool(all), forgotten=bool(forgotten), mode=mode)
+def review_page(request: Request, deck: str = "", tag: str = "", all: int = 0, forgotten: int = 0):
+    return render(request, "anki_review.html", deck=deck, tag=tag, all=bool(all), forgotten=bool(forgotten), nav="quiz")
 
 
-@router.get("/quiz/cards", response_class=HTMLResponse)
-def quiz_cards(request: Request, q: str = "", tag: str = "", due: int = 0, db: Session = Depends(get_db)):
+@router.get("/quiz/add", response_class=HTMLResponse)
+def add_page(request: Request, deck: str = "", db: Session = Depends(get_db)):
+    decks = [d["name"] for d in deck_counts(db)]
+    return render(request, "anki_add.html", card=None, mode="add", decks=decks, deck=deck or DEFAULT_DECK, nav="quiz")
+
+
+@router.get("/quiz/cards/new")
+def add_redirect(deck: str = ""):
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse("/quiz/add" + (f"?deck={deck}" if deck else ""), status_code=303)
+
+
+@router.get("/quiz/browse", response_class=HTMLResponse)
+def browse_page(request: Request, q: str = "", deck: str = "", tag: str = "", due: int = 0, db: Session = Depends(get_db)):
     items = []
-    for c in query_cards(db, q, tag, bool(due)):
+    now = utcnow()
+    for c in query_cards(db, q, tag, bool(due), deck=deck):
         d = card_out(c, with_content=False)
-        d["preview"] = d.pop("preview_text")
-        n = d["days_until_due"]
-        d["due_display"] = "due now" if d["due"] else f"in {n} day{'s' if n != 1 else ''}"
+        d["sort_field"] = d.pop("preview_text")
+        d["due_display"] = ("new" if c.reps == 0 else "learning") if (c.reps == 0 or is_learning(c)) and c.due_at <= now \
+            else ("now" if c.due_at <= now else fmt(c.due_at))
         items.append(d)
-    return render(request, "quiz_cards.html", cards=items, tags=card_tag_counts(db), q=q,
-                  active_tag=tag.lower(), due_only=bool(due))
+    decks = [d["name"] for d in deck_counts(db)]
+    return render(request, "anki_browse.html", cards=items, decks=decks, q=q, deck=deck, tag=tag, due_only=bool(due), nav="quiz")
 
 
-@router.get("/quiz/cards/new", response_class=HTMLResponse)
-def quiz_card_new(request: Request):
-    return render(request, "quiz_card_editor.html", card=None, mode="create")
+@router.get("/quiz/cards")
+def browse_redirect(q: str = "", tag: str = "", due: int = 0):
+    from fastapi.responses import RedirectResponse
+    qs = "&".join(p for p in [f"q={q}" if q else "", f"tag={tag}" if tag else "", "due=1" if due else ""] if p)
+    return RedirectResponse("/quiz/browse" + (f"?{qs}" if qs else ""), status_code=303)
 
 
 @router.get("/quiz/cards/{card_id}", response_class=HTMLResponse)
-def quiz_card_detail(request: Request, card_id: int, db: Session = Depends(get_db)):
+def card_info_page(request: Request, card_id: int, db: Session = Depends(get_db)):
     c = db.get(Card, card_id)
     if c is None:
         raise HTTPException(404, "card not found")
     d = card_out(c)
-    d["due_display"] = "due now" if d["due"] else fmt(c.due_at)
+    d["due_display"] = "now" if d["due"] else fmt(c.due_at)
+    d["added_display"] = fmt(c.created_at)
     d["history"] = [
-        {"result": r.result, "interval_days": r.interval_days, "reviewed_at": r.reviewed_at.strftime("%d %b %Y, %H:%M")}
-        for r in db.query(Review).filter(Review.card_id == card_id).order_by(Review.reviewed_at.desc()).limit(20)
+        {"result": r.result, "interval_days": r.interval_days, "reviewed_at": r.reviewed_at.strftime("%Y-%m-%d %H:%M")}
+        for r in db.query(Review).filter(Review.card_id == card_id).order_by(Review.reviewed_at.desc()).limit(50)
     ]
-    return render(request, "quiz_card_detail.html", card=d)
+    return render(request, "anki_card.html", card=d, nav="quiz")
 
 
 @router.get("/quiz/cards/{card_id}/edit", response_class=HTMLResponse)
-def quiz_card_edit(request: Request, card_id: int, db: Session = Depends(get_db)):
+def edit_page(request: Request, card_id: int, db: Session = Depends(get_db)):
     c = db.get(Card, card_id)
     if c is None:
         raise HTTPException(404, "card not found")
-    return render(request, "quiz_card_editor.html", card=card_out(c), mode="edit")
+    decks = [d["name"] for d in deck_counts(db)]
+    return render(request, "anki_add.html", card=card_out(c), mode="edit", decks=decks, deck=c.deck, nav="quiz")

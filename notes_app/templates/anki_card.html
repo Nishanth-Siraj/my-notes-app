@@ -1,0 +1,81 @@
+{% extends "anki_base.html" %}
+{% block title %}Card Info{% endblock %}
+{% block nav_browse %}current{% endblock %}
+{% block bodyclass %}cardinfo{% endblock %}
+{% block mainclass %}with-bottombar{% endblock %}
+
+{% block content %}
+<div class="qa boxed">
+  <div class="markdown-body card-content" id="question"></div>
+  <hr>
+  <div class="markdown-body card-content" id="answer"></div>
+</div>
+
+<h3>Card Info</h3>
+<table class="info">
+  <tr><td>Added</td><td>{{ card.added_display }}</td></tr>
+  <tr><td>Latest Review</td><td>{{ card.last_reviewed[:10] if card.last_reviewed else '—' }}</td></tr>
+  <tr><td>Due</td><td>{{ card.due_display }}</td></tr>
+  <tr><td>Interval</td><td>{% if card.interval_days %}{{ card.interval_days }} day{{ '' if card.interval_days == 1 else 's' }}{% else %}(new){% endif %}</td></tr>
+  <tr><td>Ease</td><td>{{ (card.ease * 100)|round|int }}%</td></tr>
+  <tr><td>Reviews</td><td>{{ card.reps }}</td></tr>
+  <tr><td>Lapses</td><td>{{ card.lapses }}</td></tr>
+  <tr><td>Card Type</td><td>Basic</td></tr>
+  <tr><td>Deck</td><td><a href="/quiz/deck/{{ card.deck }}">{{ card.deck }}</a></td></tr>
+  <tr><td>Tags</td><td>{{ card.tags|join(' ') or '—' }}</td></tr>
+  <tr><td>Card ID</td><td>{{ card.id }}</td></tr>
+</table>
+
+{% if card.history %}
+<h3>Review Log</h3>
+<table class="log">
+  <thead><tr><th>Date</th><th>Type</th><th>Rating</th><th>Interval</th></tr></thead>
+  <tbody>
+  {% for h in card.history %}
+    <tr>
+      <td>{{ h.reviewed_at }}</td>
+      <td>{% if h.interval_days == 0 %}Learn{% elif h.result == 'again' %}Relearn{% else %}Review{% endif %}</td>
+      <td class="rating {{ h.result }}">{{ {'again': '1', 'hard': '2', 'good': '3', 'easy': '4', 'custom': 'set'}[h.result] }} <span class="muted">{{ h.result }}</span></td>
+      <td>{% if h.interval_days == 0 %}&lt;10m{% else %}{{ h.interval_days }}d{% endif %}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+<script id="card-data" type="application/json">{{ card|tojson }}</script>
+{% endblock %}
+
+{% block bottombar %}
+<div class="bottombar">
+  <a class="abtn" href="/quiz/cards/{{ card.id }}/edit">Edit</a>
+  <button type="button" class="abtn" id="btn-due">Set Due Date…</button>
+  <button type="button" class="abtn" id="btn-reset">Reset</button>
+  <button type="button" class="abtn danger" id="btn-delete">Delete</button>
+  <a class="abtn" href="/quiz/browse?deck={{ card.deck }}">Close</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+  var N = window.Notes, card = JSON.parse(document.getElementById('card-data').textContent);
+  var q = document.getElementById('question'), a = document.getElementById('answer');
+  N.renderMarkdown(q, card.question); N.bindMarkdownContainer(q);
+  N.renderMarkdown(a, card.answer || '_(empty)_'); N.bindMarkdownContainer(a);
+  document.getElementById('btn-delete').addEventListener('click', function () {
+    if (!confirm('Delete this card?')) return;
+    N.api('DELETE', '/api/cards/' + card.id).then(function () { location.href = '/quiz/browse'; }).catch(function (e) { N.toast(e.message, true); });
+  });
+  document.getElementById('btn-reset').addEventListener('click', function () {
+    if (!confirm('Reset this card to new?')) return;
+    N.api('POST', '/api/cards/' + card.id + '/reset').then(function () { location.reload(); }).catch(function (e) { N.toast(e.message, true); });
+  });
+  document.getElementById('btn-due').addEventListener('click', function () {
+    var v = prompt('Show in how many days? (0 = today)', '1'); if (v === null) return;
+    var d = parseInt(v, 10); if (isNaN(d) || d < 0) { N.toast('Enter a number of days', true); return; }
+    N.api('PUT', '/api/cards/' + card.id, { due_in_days: d }).then(function () { location.reload(); }).catch(function (e) { N.toast(e.message, true); });
+  });
+})();
+</script>
+{% endblock %}

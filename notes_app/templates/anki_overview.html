@@ -1,0 +1,54 @@
+{% extends "anki_base.html" %}
+{% block title %}{{ deck.name }}{% endblock %}
+{% block nav_decks %}current{% endblock %}
+{% block bodyclass %}overview{% endblock %}
+
+{% block content %}
+<h1 class="deck-title">{{ deck.name }}</h1>
+
+{% set total_due = deck.new + deck.learn + deck.due %}
+{% if total_due %}
+<table class="overview-counts">
+  <tr><td>New:</td><td class="count"><span class="new">{{ deck.new }}</span></td></tr>
+  <tr><td>Learning:</td><td class="count"><span class="learn">{{ deck.learn }}</span></td></tr>
+  <tr><td>To Review:</td><td class="count"><span class="review">{{ deck.due }}</span></td></tr>
+</table>
+<div class="study-buttons">
+  <a class="abtn primary" href="/quiz/review?deck={{ deck.name }}" id="study-now">Study Now</a>
+</div>
+{% else %}
+<div class="congrats">
+  <h2>Congratulations! You have finished this deck for now.</h2>
+  <p>{% if deck.total %}There are no cards due today. Come back tomorrow, or study ahead.{% else %}This deck has no cards yet.{% endif %}</p>
+</div>
+{% endif %}
+
+<div class="custom-study">
+  <details>
+    <summary class="abtn">Custom Study</summary>
+    <div class="custom-items">
+      <a class="abtn" href="/quiz/review?deck={{ deck.name }}&all=1">Review ahead (all {{ deck.total }} cards)</a>
+      <a class="abtn" href="/quiz/review?deck={{ deck.name }}&forgotten=1">Relearn forgotten cards</a>
+    </div>
+  </details>
+</div>
+
+<p class="description">{{ deck.total }} card{{ '' if deck.total == 1 else 's' }} in this deck.</p>
+{% endblock %}
+
+{% block bottombar %}
+<div class="bottombar">
+  <a class="abtn" href="/quiz">Decks</a>
+  <a class="abtn" href="/quiz/add?deck={{ deck.name }}">Add</a>
+  <a class="abtn" href="/quiz/browse?deck={{ deck.name }}">Browse</a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('keydown', function (e) {
+  var s = document.getElementById('study-now');
+  if (s && (e.key === 's' || e.key === 'Enter') && document.activeElement.tagName !== 'INPUT') location.href = s.href;
+});
+</script>
+{% endblock %}

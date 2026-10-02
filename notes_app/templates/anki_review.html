@@ -1,0 +1,60 @@
+{% extends "anki_base.html" %}
+{% block title %}{{ deck or 'Study' }}{% endblock %}
+{% block nav_decks %}current{% endblock %}
+{% block bodyclass %}reviewer{% endblock %}
+{% block mainclass %}with-bottombar{% endblock %}
+
+{% block content %}
+<div id="loading" class="center muted">Loading…</div>
+
+<div id="card" class="qa" hidden>
+  <div id="question" class="card-content markdown-body"></div>
+  <hr id="answer-sep" hidden>
+  <div id="answer" class="card-content markdown-body" hidden></div>
+</div>
+
+<div id="done" class="congrats" hidden>
+  <h2>Congratulations! You have finished this deck for now.</h2>
+  <p id="done-summary"></p>
+  <p class="muted">If you wish to study outside of the regular schedule, you can use the <a href="/quiz/deck/{{ deck }}">custom study</a> feature.</p>
+  <div class="study-buttons">
+    <a class="abtn" href="/quiz/deck/{{ deck }}">Overview</a>
+    <a class="abtn" href="/quiz">Decks</a>
+  </div>
+</div>
+
+<script id="review-config" type="application/json">{{ {"deck": deck, "tag": tag, "all": all, "forgotten": forgotten}|tojson }}</script>
+{% endblock %}
+
+{% block bottombar %}
+<div class="bottombar reviewer-bar" id="bar">
+  <div class="bar-left">
+    <a class="abtn" id="btn-edit" href="#">Edit</a>
+    <span class="counts" id="counts"><span class="new">0</span> + <span class="learn">0</span> + <span class="review">0</span></span>
+  </div>
+  <div class="bar-center">
+    <button class="abtn show-answer" id="btn-show">Show Answer</button>
+    <div class="answer-buttons" id="answer-buttons" hidden>
+      <div class="ab"><span class="ivl" id="ivl-again"></span><button class="abtn again" data-rating="again">Again</button></div>
+      <div class="ab"><span class="ivl" id="ivl-hard"></span><button class="abtn hard" data-rating="hard">Hard</button></div>
+      <div class="ab"><span class="ivl" id="ivl-good"></span><button class="abtn good" data-rating="good">Good</button></div>
+      <div class="ab"><span class="ivl" id="ivl-easy"></span><button class="abtn easy" data-rating="easy">Easy</button></div>
+    </div>
+  </div>
+  <div class="bar-right">
+    <details class="menu up" id="more">
+      <summary class="abtn">More</summary>
+      <div class="menu-items">
+        <button type="button" id="m-due">Set Due Date… <kbd>D</kbd></button>
+        <button type="button" id="m-info">Card Info <kbd>I</kbd></button>
+        <button type="button" id="m-reset">Reset Card</button>
+        <button type="button" id="m-delete" class="danger">Delete Card</button>
+      </div>
+    </details>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='anki_review.js') }}"></script>
+{% endblock %}

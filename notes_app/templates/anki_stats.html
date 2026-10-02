@@ -1,0 +1,40 @@
+{% extends "anki_base.html" %}
+{% block title %}Stats{% endblock %}
+{% block nav_stats %}current{% endblock %}
+{% block bodyclass %}stats{% endblock %}
+
+{% block content %}
+<section class="heatmap-wrap" id="heatmap" data-days="365"></section>
+
+<h2>Future Due</h2>
+<p class="muted small">Cards due over the next 30 days. Today includes anything overdue.</p>
+<div class="bars" id="future-bars"></div>
+<div class="bar-labels" id="future-labels"></div>
+
+<h2>Card Counts</h2>
+<table class="counts-table">
+  <tr><td class="new">New</td><td class="n">{{ counts.new }}</td></tr>
+  <tr><td class="learn">Learning</td><td class="n">{{ counts.learning }}</td></tr>
+  <tr><td class="review">Young (interval &lt; 21d)</td><td class="n">{{ counts.young }}</td></tr>
+  <tr><td class="review">Mature (interval &ge; 21d)</td><td class="n">{{ counts.mature }}</td></tr>
+  <tr><td>Total cards</td><td class="n">{{ counts.total }}</td></tr>
+  <tr><td>Total reviews</td><td class="n">{{ counts.reviews_total }}</td></tr>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='anki_heatmap.js') }}"></script>
+<script>
+(function () {
+  var N = window.Notes;
+  N.api('GET', '/api/quiz/future?days=30&tz=' + new Date().getTimezoneOffset()).then(function (f) {
+    var max = Math.max.apply(null, f.counts.concat([1]));
+    var bars = document.getElementById('future-bars'), labels = document.getElementById('future-labels');
+    bars.innerHTML = f.counts.map(function (n, i) {
+      return '<div class="bar' + (i === 0 ? ' today' : '') + '" style="height:' + Math.round(100 * n / max) + '%" title="' + n + ' card' + (n === 1 ? '' : 's') + ' due in ' + i + ' day' + (i === 1 ? '' : 's') + '"></div>';
+    }).join('');
+    labels.innerHTML = f.counts.map(function (_, i) { return '<span>' + (i % 5 === 0 ? i : '') + '</span>'; }).join('');
+  });
+})();
+</script>
+{% endblock %}

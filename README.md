@@ -61,8 +61,10 @@ cd notes_app
 ../.venv/bin/uvicorn app:app --reload --port 8000     # http://127.0.0.1:8000
 ```
 
-### Quiz (flashcards)
+### Quiz (Anki)
 
-Open `/quiz`. Cards have a Markdown question and answer (text, code blocks, images). The review flow is Anki's: read the question, recall it in your head, press Show answer, then rate **Again / Hard / Good / Easy** (keys 1-4, Space = Good). Each button shows the interval it will set. Scheduling is Anki's SM-2 in days: new cards graduate at 1 day (Easy 4), Good multiplies by the card's ease (starts 250%), Hard x1.2 and lowers ease, Easy x1.3 extra and raises ease, Again lapses the card back to relearning in the same session (it returns a few cards later until you rate it Good) and resets it to 1 day. Intervals are capped at a year, and a custom number of days can be entered instead of the four buttons. The dashboard shows due, forgotten and new counts with "Relearn forgotten" and "Practice all" modes.
+Open `/quiz`. The quiz is laid out like Anki: **Decks** (New / Learn / Due counts per deck, Create Deck), deck **Overview** with Study Now and Custom Study (review ahead, relearn forgotten), the **Reviewer** (Show Answer, then Again / Hard / Good / Easy with the interval each would set; keys 1-4, Space = Good; More menu with Set Due Date, Card Info, Reset, Delete), **Add** (Type / Deck / Front / Back / Tags, stays open after adding; fields take Markdown with code blocks and pasted or dropped images), **Browse** (table with search, deck filter, is:due) and **Card Info** with the review log. **Stats** shows the review heatmap (streaks, days learned, future due in blue) plus future-due bars and card counts; the heatmap also sits under the deck list.
+
+Scheduling is Anki's SM-2 in days, capped at a year: new cards graduate at 1 day (Easy 4), Good multiplies by the card's ease (250% start), Hard x1.2 lowering ease, Easy x1.3 extra raising ease, Again lapses to relearning in the same session and restarts at 1 day. Set Due Date accepts any number of days.
 
 Locally it uses `notes_app/notes.db` (SQLite). For hosting, set `DATABASE_URL` to a free Postgres (Neon or Supabase) and `NOTES_PASSWORD`. See [notes_app/DEPLOY.md](notes_app/DEPLOY.md).
