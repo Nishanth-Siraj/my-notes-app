@@ -265,11 +265,11 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
   table.browse { font-size: 12px; }
 }
 
-/* ---------- review heatmap (Review Heatmap add-on look, "Lime" theme) ---------- */
-:root { --hm0: #e6e6e6; --hm1: #dae289; --hm2: #9cc069; --hm3: #6b9f3f; --hm4: #3f7f1a;
+/* ---------- review heatmap (Review Heatmap add-on look, heat palette yellow -> orange -> red) ---------- */
+:root { --hm0: #e6e6e6; --hm1: #ffe08a; --hm2: #feb24c; --hm3: #f0652f; --hm4: #c7121c;
         --hmf0: #e6e6e6; --hmf1: #cbd5e3; --hmf2: #a9bbd3; --hmf3: #7f9ac0; --hmf4: #56749f; }
 @media (prefers-color-scheme: dark) {
-  :root { --hm0: #3a3a3a; --hm1: #4b5d1a; --hm2: #5f8a22; --hm3: #7bb52e; --hm4: #a3e33a;
+  :root { --hm0: #3a3a3a; --hm1: #8a6a14; --hm2: #c48a1c; --hm3: #e8601e; --hm4: #ff3b2e;
           --hmf0: #3a3a3a; --hmf1: #3b4656; --hmf2: #4b5c75; --hmf3: #5f7599; --hmf4: #7c95bf; }
 }
 .heatmap-wrap { max-width: 900px; margin: 26px auto 0; }
@@ -291,7 +291,7 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
 .hm-cell.today { box-shadow: inset 0 0 0 2px var(--fg); }
 .hm-cell[data-title] { cursor: pointer; }
 .hm-summary { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 10px; font-size: 13px; color: var(--fg-subtle); }
-.hm-summary .v { color: var(--hm4); font-weight: 700; }
+.hm-summary .v { color: var(--hm3); font-weight: 700; }
 .hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: var(--fg-subtle); }
 .hm-legend { display: flex; align-items: center; gap: 3px; }
 .hm-legend .hm-cell { width: 11px; height: 11px; }
