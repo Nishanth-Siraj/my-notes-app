@@ -93,6 +93,12 @@
   }
   $('m-due').addEventListener('click', setDueDate);
   $('m-info').addEventListener('click', function () { if (current) location.href = '/quiz/cards/' + current.id; });
+  $('m-deck').addEventListener('click', function () {
+    if (!current) return;
+    var v = prompt('Move this card to deck:', current.deck); if (v === null || !v.trim()) return;
+    N.api('PUT', '/api/cards/' + current.id, { deck: v.trim() }).then(function (u) { current.deck = u.deck; N.toast('Moved to ' + u.deck); $('more').removeAttribute('open'); })
+      .catch(function (e) { N.toast(e.message, true); });
+  });
   $('m-reset').addEventListener('click', function () {
     if (!current || !confirm('Reset this card to new?')) return;
     N.api('POST', '/api/cards/' + current.id + '/reset').then(function () { N.toast('Card reset'); $('more').removeAttribute('open'); });

@@ -49,6 +49,7 @@
 {% block bottombar %}
 <div class="bottombar">
   <a class="abtn" href="/quiz/cards/{{ card.id }}/edit">Edit</a>
+  <button type="button" class="abtn" id="btn-deck">Change Deck…</button>
   <button type="button" class="abtn" id="btn-due">Set Due Date…</button>
   <button type="button" class="abtn" id="btn-reset">Reset</button>
   <button type="button" class="abtn danger" id="btn-delete">Delete</button>
@@ -70,6 +71,10 @@
   document.getElementById('btn-reset').addEventListener('click', function () {
     if (!confirm('Reset this card to new?')) return;
     N.api('POST', '/api/cards/' + card.id + '/reset').then(function () { location.reload(); }).catch(function (e) { N.toast(e.message, true); });
+  });
+  document.getElementById('btn-deck').addEventListener('click', function () {
+    var v = prompt('Move this card to deck:', card.deck); if (v === null || !v.trim()) return;
+    N.api('PUT', '/api/cards/' + card.id, { deck: v.trim() }).then(function () { location.reload(); }).catch(function (e) { N.toast(e.message, true); });
   });
   document.getElementById('btn-due').addEventListener('click', function () {
     var v = prompt('Show in how many days? (0 = today)', '1'); if (v === null) return;

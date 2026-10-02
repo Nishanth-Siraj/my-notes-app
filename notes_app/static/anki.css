@@ -265,7 +265,13 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
   table.browse { font-size: 12px; }
 }
 
-/* ---------- review heatmap ---------- */
+/* ---------- review heatmap (Review Heatmap add-on look, "Lime" theme) ---------- */
+:root { --hm0: #e6e6e6; --hm1: #dae289; --hm2: #9cc069; --hm3: #6b9f3f; --hm4: #3f7f1a;
+        --hmf0: #e6e6e6; --hmf1: #cbd5e3; --hmf2: #a9bbd3; --hmf3: #7f9ac0; --hmf4: #56749f; }
+@media (prefers-color-scheme: dark) {
+  :root { --hm0: #3a3a3a; --hm1: #4b5d1a; --hm2: #5f8a22; --hm3: #7bb52e; --hm4: #a3e33a;
+          --hmf0: #3a3a3a; --hmf1: #3b4656; --hmf2: #4b5c75; --hmf3: #5f7599; --hmf4: #7c95bf; }
+}
 .heatmap-wrap { max-width: 900px; margin: 26px auto 0; }
 .hm-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
 .hm-title { font-weight: 600; font-size: 14px; }
@@ -273,26 +279,22 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
 .hm-range button { background: none; border: 1px solid transparent; border-radius: 4px; color: var(--fg-subtle); font: inherit; font-size: 12px; padding: 2px 7px; cursor: pointer; }
 .hm-range button.active { border-color: var(--border); color: var(--fg); background: var(--btn-bg); }
 .hm-scroll { overflow-x: auto; padding-bottom: 4px; }
-.hm-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 12px); gap: 3px; width: max-content; }
-.hm-months { display: grid; grid-auto-flow: column; width: max-content; font-size: 10px; color: var(--fg-subtle); margin-bottom: 3px; }
-.hm-cell { width: 12px; height: 12px; border-radius: 2px; background: var(--hm0); }
+.hm-body { display: flex; gap: 6px; width: max-content; }
+.hm-dow { display: grid; grid-template-rows: repeat(7, 13px); gap: 2px; font-size: 9px; color: var(--fg-subtle); margin-top: 15px; }
+.hm-dow span { line-height: 13px; }
+.hm-months { display: grid; grid-auto-flow: column; grid-auto-columns: 15px; font-size: 10px; color: var(--fg-subtle); height: 13px; margin-bottom: 2px; white-space: nowrap; }
+.hm-grid { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 13px); grid-auto-columns: 13px; gap: 2px; }
+.hm-cell { width: 13px; height: 13px; border-radius: 2px; background: var(--hm0); }
 .hm-cell.l1 { background: var(--hm1); } .hm-cell.l2 { background: var(--hm2); } .hm-cell.l3 { background: var(--hm3); } .hm-cell.l4 { background: var(--hm4); }
-.hm-cell.today { outline: 2px solid var(--fg); outline-offset: -2px; }
-.hm-cell.future { background: transparent; border: 1px dashed var(--border); }
+.hm-cell.future { background: var(--hmf0); }
 .hm-cell.future.l1 { background: var(--hmf1); } .hm-cell.future.l2 { background: var(--hmf2); } .hm-cell.future.l3 { background: var(--hmf3); } .hm-cell.future.l4 { background: var(--hmf4); }
-:root { --hm0: #ebedf0; --hm1: #c6e48b; --hm2: #7bc96f; --hm3: #239a3b; --hm4: #196127;
-        --hmf1: #cfe3ff; --hmf2: #9ac4ff; --hmf3: #5b9bff; --hmf4: #2a6fd6; }
-@media (prefers-color-scheme: dark) {
-  :root { --hm0: #2d333b; --hm1: #0e4429; --hm2: #006d32; --hm3: #26a641; --hm4: #39d353;
-          --hmf1: #16365c; --hmf2: #1f4f8a; --hmf3: #2d6fc0; --hmf4: #4b8ff0; }
-}
-.hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 8px; font-size: 12px; color: var(--fg-subtle); }
+.hm-cell.today { box-shadow: inset 0 0 0 2px var(--fg); }
+.hm-cell[data-title] { cursor: pointer; }
+.hm-summary { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 10px; font-size: 13px; color: var(--fg-subtle); }
+.hm-summary .v { color: var(--hm4); font-weight: 700; }
+.hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: var(--fg-subtle); }
 .hm-legend { display: flex; align-items: center; gap: 3px; }
-.hm-legend .hm-cell { width: 10px; height: 10px; }
-.hm-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 12px; }
-.hm-stat { background: var(--window); border: 1px solid var(--border); border-radius: 5px; padding: 8px 10px; text-align: center; }
-.hm-stat .v { font-size: 1.25rem; font-weight: 700; }
-.hm-stat .k { font-size: 11px; color: var(--fg-subtle); }
+.hm-legend .hm-cell { width: 11px; height: 11px; }
 .hm-tip { position: fixed; z-index: 50; background: #222; color: #fff; font-size: 12px; padding: 4px 8px; border-radius: 4px; pointer-events: none; white-space: nowrap; display: none; }
 
 /* ---------- stats page ---------- */

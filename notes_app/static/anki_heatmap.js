@@ -52,24 +52,24 @@ window.AnkiHeatmap = (function () {
         else cells += '<div class="' + cls + '" data-title="' + title + '"></div>';
         if (d.getDay() === 0) {                      // new column: month label when the month changes
           var m = d.getMonth();
-          months += '<span style="width:15px">' + (m !== lastMonth && d >= start ? d.toLocaleString(undefined, { month: 'short' }) : '') + '</span>';
+          months += '<span>' + (m !== lastMonth && d >= start ? d.toLocaleString(undefined, { month: 'short' }) : '') + '</span>';
           lastMonth = m; col++;
         }
       }
+      var dow = ['', 'Mon', '', 'Wed', '', 'Fri', ''].map(function (l) { return '<span>' + l + '</span>'; }).join('');
       container.innerHTML =
         '<div class="hm-head"><span class="hm-title">Review heatmap</span><span class="hm-range">' +
           [365, 180, 90].map(function (d) { return '<button type="button" data-days="' + d + '" class="' + (d === days ? 'active' : '') + '">' + (d === 365 ? '1 year' : d + ' days') + '</button>'; }).join('') +
         '</span></div>' +
-        '<div class="hm-scroll"><div class="hm-months">' + months + '</div><div class="hm-grid">' + cells + '</div></div>' +
-        '<div class="hm-foot"><span>Past: reviews per day · Future: cards due</span>' +
-          '<span class="hm-legend">Less <span class="hm-cell"></span><span class="hm-cell l1"></span><span class="hm-cell l2"></span><span class="hm-cell l3"></span><span class="hm-cell l4"></span> More</span></div>' +
-        '<div class="hm-stats">' +
-          stat(hm.streak_current + (hm.streak_current === 1 ? ' day' : ' days'), 'Current streak') +
-          stat(hm.streak_longest + (hm.streak_longest === 1 ? ' day' : ' days'), 'Longest streak') +
-          stat(hm.days_learned_pct + '%', 'Days learned (' + hm.days_learned + '/' + days + ')') +
-          stat(hm.avg_active_day, 'Avg per active day') +
-          stat(hm.total, 'Reviews in period') +
-        '</div>';
+        '<div class="hm-scroll"><div class="hm-body"><div class="hm-dow">' + dow + '</div><div><div class="hm-months">' + months + '</div><div class="hm-grid">' + cells + '</div></div></div></div>' +
+        '<div class="hm-summary">' +
+          '<span>Daily average: <b class="v">' + hm.avg_day + '</b> cards</span>' +
+          '<span>Days learned: <b class="v">' + hm.days_learned_pct + '%</b></span>' +
+          '<span>Longest streak: <b class="v">' + hm.streak_longest + '</b> day' + (hm.streak_longest === 1 ? '' : 's') + '</span>' +
+          '<span>Current streak: <b class="v">' + hm.streak_current + '</b> day' + (hm.streak_current === 1 ? '' : 's') + '</span>' +
+        '</div>' +
+        '<div class="hm-foot"><span class="hm-legend">Less <span class="hm-cell l0"></span><span class="hm-cell l1"></span><span class="hm-cell l2"></span><span class="hm-cell l3"></span><span class="hm-cell l4"></span> More</span>' +
+          '<span class="hm-legend">Due <span class="hm-cell future l1"></span><span class="hm-cell future l2"></span><span class="hm-cell future l3"></span><span class="hm-cell future l4"></span></span></div>';
 
       container.querySelectorAll('.hm-range button').forEach(function (b) {
         b.addEventListener('click', function () { container.dataset.days = b.dataset.days; render(container, opts); });
