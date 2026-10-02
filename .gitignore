@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 notes_app/notes.db
 notes_app/uploads/
+.env
+.env.*
+!.env.example
+.neon

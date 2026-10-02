@@ -15,6 +15,8 @@ Storage:
     NOTES_PASSWORD   if set, the app asks for this password before use
     NOTES_SECRET     secret for the login cookie (auto-generated if unset,
                      which logs everyone out on each restart)
+
+    These can also be put in notes_app/.env (gitignored), one KEY=VALUE per line.
 """
 
 import datetime
@@ -41,6 +43,24 @@ from starlette.middleware.sessions import SessionMiddleware
 # --------------------------------------------------------------------------- #
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+def load_dotenv(path):
+    """Minimal .env loader: KEY=VALUE lines, no dependency. Existing env wins."""
+    if not os.path.exists(path):
+        return
+    with open(path) as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            k, v = k.strip(), v.strip().strip('"').strip("'")
+            os.environ.setdefault(k, v)
+
+
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
 DATA_DIR = os.environ.get("NOTES_DATA_DIR", BASE_DIR)
 DATABASE_URL = os.environ.get("DATABASE_URL") or f"sqlite:///{os.path.join(DATA_DIR, 'notes.db')}"
 # Heroku/Render style URLs -> SQLAlchemy psycopg3 driver
