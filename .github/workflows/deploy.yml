@@ -1,0 +1,48 @@
+name: Deploy to Render
+
+# Triggers a Render deploy on every push (or merged PR) to main, then waits
+# until the live service reports healthy. Needs one repository secret:
+#   RENDER_DEPLOY_HOOK  -> Render service > Settings > Deploy Hook URL
+# Optional secret:
+#   RENDER_SERVICE_URL  -> e.g. https://my-notes-app-erwg.onrender.com (for the health wait)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: render-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK secret is not set (Render > service > Settings > Deploy Hook)"; exit 1
+          fi
+          code=$(curl -s -o /tmp/hook.json -w '%{http_code}' -X POST "$HOOK")
+          echo "Render responded $code"; cat /tmp/hook.json; echo
+          [ "$code" = "200" ] || [ "$code" = "201" ]
+
+      - name: Wait for the new version to be live
+        env:
+          URL: ${{ secrets.RENDER_SERVICE_URL }}
+        run: |
+          if [ -z "$URL" ]; then echo "RENDER_SERVICE_URL not set; skipping health wait"; exit 0; fi
+          echo "Waiting for $URL/healthz ..."
+          # Render keeps the old version serving until the new one is healthy, so first
+          # give the build a head start, then poll until we get a 200.
+          sleep 90
+          for i in $(seq 1 40); do
+            if curl -fsS -m 20 "$URL/healthz" >/dev/null 2>&1; then
+              echo "Healthy after ~$((90 + i*15))s"; exit 0
+            fi
+            sleep 15
+          done
+          echo "::warning::Service did not report healthy within ~12 minutes; check the Render dashboard"
