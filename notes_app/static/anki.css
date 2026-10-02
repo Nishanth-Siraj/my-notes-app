@@ -265,12 +265,13 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
   table.browse { font-size: 12px; }
 }
 
-/* ---------- review heatmap (Review Heatmap add-on look, amber palette, butter -> gold -> deep amber) ---------- */
-:root { --hm0: #ebedf0; --hm1: #fde68a; --hm2: #fbbf24; --hm3: #f59e0b; --hm4: #b45309;
+/* ---------- review heatmap (Review Heatmap add-on look, gold palette, pale yellow -> bright gold (no brown/red)) ---------- */
+:root { --hm0: #ebedf0; --hm1: #fff3bf; --hm2: #ffe066; --hm3: #ffd43b; --hm4: #fab005;
         --hmf0: #ebedf0; --hmf1: #bae6fd; --hmf2: #7dd3fc; --hmf3: #38bdf8; --hmf4: #0284c7; }
 @media (prefers-color-scheme: dark) {
-  :root { --hm0: #30363d; --hm1: #78350f; --hm2: #b45309; --hm3: #f59e0b; --hm4: #fcd34d;
+  :root { --hm0: #30363d; --hm1: #5c4d0a; --hm2: #8a7312; --hm3: #c9a81c; --hm4: #ffd43b;
           --hmf0: #30363d; --hmf1: #0c4a6e; --hmf2: #075985; --hmf3: #0284c7; --hmf4: #38bdf8; }
+}
 }
 }
 .heatmap-wrap { max-width: 900px; margin: 26px auto 0; }
@@ -292,7 +293,7 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
 .hm-cell.today { box-shadow: inset 0 0 0 2px var(--fg); }
 .hm-cell[data-title] { cursor: pointer; }
 .hm-summary { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 10px; font-size: 13px; color: var(--fg-subtle); }
-.hm-summary .v { color: var(--hm3); font-weight: 700; }
+.hm-summary .v { color: var(--hm4); font-weight: 700; }
 .hm-foot { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; font-size: 11px; color: var(--fg-subtle); }
 .hm-legend { display: flex; align-items: center; gap: 3px; }
 .hm-legend .hm-cell { width: 11px; height: 11px; }

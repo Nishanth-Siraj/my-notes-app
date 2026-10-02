@@ -6,7 +6,7 @@ window.AnkiHeatmap = (function () {
 
   function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function addDays(d, n) { var x = new Date(d); x.setDate(x.getDate() + n); return x; }
-  function level(n, max) { if (!n) return 0; var r = n / Math.max(max, 1); return r > .75 ? 4 : r > .5 ? 3 : r > .25 ? 2 : 1; }
+  function level(n, max) { if (!n) return 0; var r = n / Math.max(max, 20); return r > .75 ? 4 : r > .5 ? 3 : r > .25 ? 2 : 1; }   // scale never below 20/day so one light day isn't painted darkest
 
   var tip = null;
   function tooltip() {
