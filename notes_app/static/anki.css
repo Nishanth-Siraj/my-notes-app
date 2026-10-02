@@ -347,8 +347,12 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
   .answer-buttons { overflow-x: auto; }
   .anki-main.with-bottombar { padding-bottom: 130px; }
   .hm-summary { gap: 4px 16px; }
-  .browse-search { overflow-x: auto; flex-wrap: nowrap; }
-  .browse-search input[type=search] { flex: 1 0 200px; }
+  /* Browse filters stack on phones: deck, then search box, then is:due + Search on one line */
+  .browse-search { overflow: visible; flex-wrap: wrap; gap: 8px; }
+  .browse-search select { flex: 1 1 100%; width: 100%; }
+  .browse-search input[type=search] { flex: 1 1 100%; width: 100%; }
+  .browse-search .chk { flex: 1 1 auto; }
+  .browse-search .abtn { flex: 0 0 auto; margin-left: auto; }
 }
 
 /* toolbar spacing on narrow screens */
