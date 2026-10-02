@@ -12,6 +12,7 @@
 <div class="bar-labels" id="future-labels"></div>
 
 <h2>Card Counts</h2>
+<div class="scroll-x">
 <table class="counts-table">
   <tr><td class="new">New</td><td class="n">{{ counts.new }}</td></tr>
   <tr><td class="learn">Learning</td><td class="n">{{ counts.learning }}</td></tr>
@@ -20,6 +21,7 @@
   <tr><td>Total cards</td><td class="n">{{ counts.total }}</td></tr>
   <tr><td>Total reviews</td><td class="n">{{ counts.reviews_total }}</td></tr>
 </table>
+</div>
 {% endblock %}
 
 {% block scripts %}

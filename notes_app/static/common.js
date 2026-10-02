@@ -56,6 +56,10 @@ window.Notes = (function () {
     var raw = marked.parse(md || '');
     target.innerHTML = DOMPurify.sanitize(raw, { ADD_ATTR: ['target'] });
     target.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = '_blank'; a.rel = 'noopener'; });
+    target.querySelectorAll('table').forEach(function (t) {
+      if (t.parentElement.classList.contains('scroll-x')) return;
+      var w = document.createElement('div'); w.className = 'scroll-x'; t.parentNode.insertBefore(w, t); w.appendChild(t);
+    });
   }
 
   // Copy buttons + image clicks inside any rendered markdown container

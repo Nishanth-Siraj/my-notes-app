@@ -12,6 +12,7 @@
 </div>
 
 <h3>Card Info</h3>
+<div class="scroll-x">
 <table class="info">
   <tr><td>Added</td><td>{{ card.added_display }}</td></tr>
   <tr><td>Latest Review</td><td>{{ card.last_reviewed[:10] if card.last_reviewed else '—' }}</td></tr>
@@ -25,9 +26,11 @@
   <tr><td>Tags</td><td>{{ card.tags|join(' ') or '—' }}</td></tr>
   <tr><td>Card ID</td><td>{{ card.id }}</td></tr>
 </table>
+</div>
 
 {% if card.history %}
 <h3>Review Log</h3>
+<div class="scroll-x">
 <table class="log">
   <thead><tr><th>Date</th><th>Type</th><th>Rating</th><th>Interval</th></tr></thead>
   <tbody>
@@ -41,6 +44,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% endif %}
 
 <script id="card-data" type="application/json">{{ card|tojson }}</script>

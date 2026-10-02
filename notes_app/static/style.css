@@ -440,3 +440,5 @@ h1 { margin: 0; font-size: 1.6rem; line-height: 1.25; }
   .quiz-actions .btn.big { padding: 12px 14px; }
   .quiz-actions .btn:not(.primary):not(.danger) { flex-basis: calc(50% - 5px); }
 }
+
+.scroll-x { overflow-x: auto; max-width: 100%; }

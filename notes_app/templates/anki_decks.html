@@ -4,6 +4,7 @@
 {% block bodyclass %}deckbrowser{% endblock %}
 
 {% block content %}
+<div class="scroll-x">
 <table class="decks" id="decks">
   <thead>
     <tr><th class="name">Deck</th><th class="count">New</th><th class="count">Learn</th><th class="count">Due</th><th class="gear"></th></tr>
@@ -29,6 +30,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 
 <p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% else %}No cards have been studied today.{% endif %}</p>
 
