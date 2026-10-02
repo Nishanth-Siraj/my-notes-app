@@ -349,3 +349,7 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
   .browse-search { overflow-x: auto; flex-wrap: nowrap; }
   .browse-search input[type=search] { flex: 1 0 200px; }
 }
+
+/* toolbar spacing on narrow screens */
+.toolbar { column-gap: 12px; }
+@media (max-width: 400px) { .tb-center { gap: 12px; } .tb-side.left { font-size: 12px; } }
