@@ -46,7 +46,9 @@ from starlette.middleware.sessions import SessionMiddleware
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
-sys.modules.setdefault("app", sys.modules[__name__])   # so `from app import ...` in quiz.py hits this module
+# quiz.py imports shared objects from this module under a fixed alias, so it works whether this
+# file was imported as `app` (uvicorn in notes_app/) or `notes_app.app` (root shim on Render).
+sys.modules["notes_core"] = sys.modules[__name__]
 
 
 def load_dotenv(path):
@@ -188,7 +190,8 @@ def logout(request: Request):
 
 @app.get("/healthz")
 def healthz():
-    return {"ok": True}
+    # Render exposes the deployed commit as RENDER_GIT_COMMIT; CI uses it to wait for the right build.
+    return {"ok": True, "commit": os.environ.get("RENDER_GIT_COMMIT") or os.environ.get("GIT_COMMIT") or "unknown"}
 
 
 # --------------------------------------------------------------------------- #

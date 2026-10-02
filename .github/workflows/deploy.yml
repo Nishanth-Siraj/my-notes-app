@@ -30,19 +30,19 @@ jobs:
           echo "Render responded $code"; cat /tmp/hook.json; echo
           [ "$code" = "200" ] || [ "$code" = "201" ]
 
-      - name: Wait for the new version to be live
+      - name: Wait until this commit is live
         env:
           URL: ${{ secrets.RENDER_SERVICE_URL }}
+          WANT: ${{ github.sha }}
         run: |
-          if [ -z "$URL" ]; then echo "RENDER_SERVICE_URL not set; skipping health wait"; exit 0; fi
-          echo "Waiting for $URL/healthz ..."
-          # Render keeps the old version serving until the new one is healthy, so first
-          # give the build a head start, then poll until we get a 200.
-          sleep 90
-          for i in $(seq 1 40); do
-            if curl -fsS -m 20 "$URL/healthz" >/dev/null 2>&1; then
-              echo "Healthy after ~$((90 + i*15))s"; exit 0
-            fi
+          if [ -z "$URL" ]; then echo "RENDER_SERVICE_URL not set; skipping wait"; exit 0; fi
+          echo "Waiting for $URL/healthz to report commit $WANT ..."
+          # The old version keeps serving while Render builds, so poll until /healthz
+          # returns the commit we just pushed (up to ~15 minutes).
+          for i in $(seq 1 60); do
+            got=$(curl -fsS -m 20 "$URL/healthz" 2>/dev/null | sed -n 's/.*"commit": *"\([^"]*\)".*/\1/p')
+            if [ "$got" = "$WANT" ]; then echo "Live: $got after ~$((i*15))s"; exit 0; fi
             sleep 15
           done
-          echo "::warning::Service did not report healthy within ~12 minutes; check the Render dashboard"
+          echo "::error::Commit $WANT not live after ~15 minutes (last seen: ${got:-none}). Check the Render dashboard."
+          exit 1

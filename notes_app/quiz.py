@@ -23,7 +23,7 @@ from pydantic import BaseModel
 from sqlalchemy import Column, DateTime, Float, Integer, String, Text, inspect, literal, or_, text
 from sqlalchemy.orm import Session
 
-from app import Base, get_db, norm_tags, render, require_login, utcnow
+from notes_core import Base, get_db, norm_tags, render, require_login, utcnow  # alias set by app.py
 
 router = APIRouter(dependencies=[Depends(require_login)])
 
