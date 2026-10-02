@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Walkthroughs</title>
+  <meta name="description" content="Index of AWS console walkthroughs with screenshots and matching Python CLI commands.">
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --text: #16191f;
+      --muted: #5f6b7a;
+      --border: #d5dbdb;
+      --accent: #ec7211;
+      --accent-text: #ffffff;
+      --link: #0972d3;
+      --code-bg: #eef1f4;
+      --hero-bg: #232f3e;
+      --hero-text: #ffffff;
+      --s3: #3f8624;
+      --shadow: 0 1px 3px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+      --shadow-hover: 0 4px 10px rgba(0,0,0,.14), 0 10px 28px rgba(0,0,0,.10);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f1419;
+        --surface: #1a2029;
+        --text: #e8ebee;
+        --muted: #9aa5b1;
+        --border: #2f3843;
+        --accent: #ff9900;
+        --accent-text: #16191f;
+        --link: #4da3ff;
+        --code-bg: #0f1419;
+        --hero-bg: #ff9900;
+        --hero-text: #16191f;
+        --s3: #5fbf3a;
+        --shadow: 0 1px 3px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.4);
+        --shadow-hover: 0 4px 10px rgba(0,0,0,.6), 0 10px 28px rgba(0,0,0,.5);
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f1419;
+      --surface: #1a2029;
+      --text: #e8ebee;
+      --muted: #9aa5b1;
+      --border: #2f3843;
+      --accent: #ff9900;
+      --accent-text: #16191f;
+      --link: #4da3ff;
+      --code-bg: #0f1419;
+      --hero-bg: #ff9900;
+      --hero-text: #16191f;
+      --s3: #5fbf3a;
+      --shadow: 0 1px 3px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.4);
+      --shadow-hover: 0 4px 10px rgba(0,0,0,.6), 0 10px 28px rgba(0,0,0,.5);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Amazon Ember", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--link); }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .9em;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .1em .4em;
+    }
+
+    header {
+      background: var(--hero-bg);
+      color: var(--hero-text);
+      padding: 40px 16px 36px;
+    }
+    header .wrap { max-width: 1100px; margin: 0 auto; }
+    header h1 { margin: 0 0 8px; font-size: 2rem; }
+    header p { margin: 0; opacity: .85; max-width: 70ch; }
+    header code { background: rgba(0,0,0,.28); border-color: rgba(0,0,0,.35); color: inherit; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 28px 16px 64px; }
+
+    h2.section {
+      font-size: .95rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted);
+      margin: 28px 0 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    h2.section::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    h2.section:first-child { margin-top: 0; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      display: flex; flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      color: inherit;
+      text-decoration: none;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .card:hover, .card:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+      outline: none;
+    }
+    .card .thumb {
+      aspect-ratio: 16 / 8;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+    .card .thumb img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top left;
+      display: block;
+    }
+    .card .service {
+      position: absolute; top: 10px; left: 10px;
+      background: var(--s3); color: #fff;
+      font-size: .72rem; font-weight: 700;
+      letter-spacing: .04em;
+      padding: 3px 9px; border-radius: 999px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    }
+    .card .level {
+      position: absolute; top: 10px; right: 10px;
+      background: var(--accent); color: var(--accent-text);
+      font-size: .72rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 999px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.3);
+    }
+    .card .body { padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .card h3 { margin: 0; font-size: 1.15rem; }
+    .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+    .card .meta {
+      margin-top: auto; padding-top: 10px;
+      display: flex; flex-wrap: wrap; gap: 6px 14px;
+      font-size: .8rem; color: var(--muted);
+    }
+    .card .meta span::before { content: "•"; margin-right: 6px; opacity: .6; }
+    .card .meta span:first-child::before { content: none; }
+    .card .cta {
+      color: var(--link); font-weight: 600; font-size: .9rem;
+      margin-top: 4px;
+    }
+
+    .tools { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .tool {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+    }
+    .tool h3 { margin: 0 0 4px; font-size: 1rem; }
+    .tool p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .tool ul { margin: 8px 0 0; padding-left: 18px; font-size: .9rem; }
+
+    footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 24px 16px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <h1>AWS Walkthroughs</h1>
+    <p>Step-by-step screenshots of AWS console tasks, each paired with the matching Python CLI command from this project.</p>
+  </div>
+</header>
+
+<main>
+
+  <h2 class="section">Contents</h2>
+  <div class="grid">
+
+    <a class="card" href="aws_s3_basic.html">
+      <div class="thumb">
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-list-page.png" alt="AWS S3 console showing one bucket in the bucket list" loading="lazy">
+        <span class="service">S3</span>
+        <span class="level">Basic</span>
+      </div>
+      <div class="body">
+        <h3>AWS S3 Bucket Basic Walkthrough</h3>
+        <p>Create a bucket, list it, upload a file, then empty and delete it. Covers the "bucket not empty" error and how to get past it.</p>
+        <div class="meta">
+          <span>10 steps</span>
+          <span>ap-south-1</span>
+          <span>2 Oct 2026</span>
+        </div>
+        <div class="cta">Open walkthrough &rarr;</div>
+      </div>
+    </a>
+
+  </div>
+
+  <h2 class="section">Tools</h2>
+  <div class="tools">
+    <div class="tool">
+      <h3><code>s3_manager.py</code></h3>
+      <p>Python CLI used throughout the walkthroughs. Requires boto3 and AWS credentials.</p>
+      <ul>
+        <li><code>create</code>, <code>list</code>, <code>detail</code>, <code>update</code></li>
+        <li><code>upload</code>, <code>empty</code>, <code>delete</code></li>
+      </ul>
+    </div>
+    <div class="tool">
+      <h3>Setup</h3>
+      <p>See <a href="README.md">README.md</a> for installation and usage examples.</p>
+      <ul>
+        <li><code>pip install -r requirements.txt</code></li>
+        <li><code>aws configure</code> or export access keys</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<footer>Screenshots captured from the AWS Management Console.</footer>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ status }}{% endblock %}
+{% block content %}
+<div class="empty-state">
+  <h1>{{ status }}</h1>
+  <p>{{ detail }}</p>
+  <a href="/" class="btn primary">Back to all notes</a>
+</div>
+{% endblock %}

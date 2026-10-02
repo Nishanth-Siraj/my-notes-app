@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Notes{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/">Notes</a>
+    <nav class="topnav">
+      <a href="/" class="navlink">All notes</a>
+      <a href="/notes/new" class="btn primary small">+ New note</a>
+      {% if has_password %}
+      <form method="post" action="/logout" class="inline"><button class="btn small ghost" type="submit">Log out</button></form>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+
+<main class="container {% block containerclass %}{% endblock %}">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- Image viewer -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <div class="lb-bar">
+    <div class="lb-title" id="lb-title"></div>
+    <button class="lb-btn" id="lb-zoom-out" title="Zoom out (-)">&minus;</button>
+    <div class="lb-zoom" id="lb-zoom-level">100%</div>
+    <button class="lb-btn" id="lb-zoom-in" title="Zoom in (+)">+</button>
+    <button class="lb-btn" id="lb-fit" title="Fit (F)">Fit</button>
+    <button class="lb-btn" id="lb-actual" title="Actual size (1)">1:1</button>
+    <a class="lb-btn" id="lb-newtab" href="#" target="_blank" rel="noopener">New tab</a>
+    <button class="lb-btn primary" id="lb-close" title="Close (Esc)">&times;</button>
+  </div>
+  <div class="lb-stage" id="lb-stage"><img id="lb-img" src="" alt="" draggable="false"></div>
+  <div class="lb-foot">Scroll to zoom &middot; drag to pan &middot; double-click to toggle &middot; Esc to close</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="{{ url_for('static', path='common.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

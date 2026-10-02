@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS S3 Bucket Basic Walkthrough</title>
+  <meta name="description" content="Step-by-step screenshots of creating, listing, uploading to, emptying and deleting an S3 bucket in the AWS Console, mapped to the s3_manager.py CLI.">
+  <style>
+    :root {
+      --bg: #f4f5f7;
+      --surface: #ffffff;
+      --text: #16191f;
+      --muted: #5f6b7a;
+      --border: #d5dbdb;
+      --accent: #ec7211;
+      --accent-text: #ffffff;
+      --link: #0972d3;
+      --code-bg: #eef1f4;
+      --step-bg: #232f3e;
+      --step-text: #ffffff;
+      --shadow: 0 1px 3px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0f1419;
+        --surface: #1a2029;
+        --text: #e8ebee;
+        --muted: #9aa5b1;
+        --border: #2f3843;
+        --accent: #ff9900;
+        --accent-text: #16191f;
+        --link: #4da3ff;
+        --code-bg: #0f1419;
+        --step-bg: #ff9900;
+        --step-text: #16191f;
+        --shadow: 0 1px 3px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.4);
+      }
+    }
+    :root[data-theme="dark"] {
+      --bg: #0f1419;
+      --surface: #1a2029;
+      --text: #e8ebee;
+      --muted: #9aa5b1;
+      --border: #2f3843;
+      --accent: #ff9900;
+      --accent-text: #16191f;
+      --link: #4da3ff;
+      --code-bg: #0f1419;
+      --step-bg: #ff9900;
+      --step-text: #16191f;
+      --shadow: 0 1px 3px rgba(0,0,0,.5), 0 4px 12px rgba(0,0,0,.4);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Amazon Ember", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+    }
+    a { color: var(--link); }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: .9em;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .1em .4em;
+    }
+    pre {
+      margin: 0;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      overflow-x: auto;
+      font-size: .85rem;
+    }
+    pre code { background: none; border: 0; padding: 0; }
+
+    header {
+      background: var(--step-bg);
+      color: var(--step-text);
+      padding: 32px 16px;
+    }
+    header .wrap { max-width: 1100px; margin: 0 auto; }
+    header h1 { margin: 0 0 6px; font-size: 1.75rem; }
+    header p { margin: 0; opacity: .85; max-width: 70ch; }
+    header code {
+      background: rgba(0,0,0,.28);
+      border-color: rgba(0,0,0,.35);
+      color: inherit;
+    }
+    header .back {
+      display: inline-block;
+      margin-bottom: 12px;
+      font-size: .85rem;
+      color: inherit;
+      opacity: .8;
+      text-decoration: none;
+    }
+    header .back:hover { opacity: 1; text-decoration: underline; }
+    header .meta {
+      margin-top: 14px;
+      display: flex; flex-wrap: wrap; gap: 8px 20px;
+      font-size: .85rem; opacity: .9;
+    }
+
+    .layout {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 24px 16px 64px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    main { min-width: 0; }
+
+    /* Sidebar table of contents */
+    nav.toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      align-self: start;
+    }
+    nav.toc h2 {
+      margin: 0; font-size: .85rem;
+      text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav.toc summary {
+      list-style: none; cursor: pointer;
+      font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav.toc summary::-webkit-details-marker { display: none; }
+    nav.toc summary::after { content: "\25BE"; font-size: .9rem; transition: transform .15s; }
+    nav.toc details[open] summary::after { transform: rotate(180deg); }
+    nav.toc details[open] summary { margin-bottom: 8px; }
+    nav.toc .group {
+      margin: 10px 0 4px; font-size: .72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+    }
+    nav.toc ol { margin: 0; padding: 0; list-style: none; }
+    nav.toc li { margin: 0; }
+    nav.toc a {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 6px 8px; border-radius: 6px;
+      color: var(--text); text-decoration: none; font-size: .9rem; line-height: 1.3;
+      border-left: 3px solid transparent;
+    }
+    nav.toc a:hover { background: var(--code-bg); }
+    nav.toc a .n {
+      flex: 0 0 1.4em; text-align: right;
+      font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums;
+    }
+    nav.toc a.active {
+      background: var(--code-bg);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+    nav.toc a.active .n { color: var(--accent); }
+    nav.toc .summary-link { margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+
+    @media (min-width: 960px) {
+      .layout { grid-template-columns: 250px minmax(0, 1fr); gap: 28px; }
+      nav.toc {
+        position: sticky; top: 16px;
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
+      }
+      nav.toc summary { pointer-events: none; }
+      nav.toc summary::after { display: none; }
+      nav.toc details[open] summary { margin-bottom: 6px; }
+    }
+
+    .phase {
+      margin: 36px 0 14px;
+      font-size: 1.25rem;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .phase::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .step-head {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 18px 20px 12px;
+    }
+    .step-num {
+      flex: 0 0 auto;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--step-bg); color: var(--step-text);
+      display: grid; place-items: center;
+      font-weight: 700; font-size: 1rem;
+    }
+    .step-head h3 { margin: 2px 0 4px; font-size: 1.1rem; }
+    .step-head p { margin: 0; color: var(--muted); }
+    .step-body {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 0 20px 20px;
+    }
+    @media (min-width: 900px) {
+      .step-body { grid-template-columns: 1.6fr 1fr; align-items: start; }
+    }
+    figure { margin: 0; }
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: zoom-in;
+      background: #fff;
+    }
+    figcaption { font-size: .8rem; color: var(--muted); margin-top: 6px; word-break: break-all; }
+    .notes h4 { margin: 0 0 6px; font-size: .85rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+    .notes ul { margin: 0 0 14px; padding-left: 18px; }
+    .notes li { margin: 3px 0; }
+    .tag {
+      display: inline-block;
+      font-size: .75rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 999px;
+      background: var(--accent); color: var(--accent-text);
+      margin-left: 6px; vertical-align: middle;
+    }
+    .tag.warn { background: #d13212; color: #fff; }
+
+    .summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-top: 36px;
+      box-shadow: var(--shadow);
+    }
+    .summary table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    .summary th, .summary td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .summary th { color: var(--muted); font-weight: 600; }
+    .summary tr:last-child td { border-bottom: 0; }
+
+    /* Image viewer (lightbox with zoom) */
+    .lightbox {
+      position: fixed; inset: 0;
+      background: #0b0e12;
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .lightbox.open { display: flex; }
+    .lb-bar {
+      flex: 0 0 auto;
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      background: rgba(20,24,30,.95);
+      color: #fff;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+      flex-wrap: wrap;
+    }
+    .lb-title {
+      flex: 1 1 200px;
+      font-size: .9rem; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .lb-btn {
+      appearance: none;
+      background: rgba(255,255,255,.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 6px;
+      min-width: 36px; height: 34px;
+      padding: 0 10px;
+      font-size: .95rem; font-weight: 600;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .lb-btn:hover { background: rgba(255,255,255,.2); }
+    .lb-btn:disabled { opacity: .35; cursor: default; }
+    .lb-btn.primary { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+    .lb-zoom {
+      min-width: 64px; text-align: center;
+      font-variant-numeric: tabular-nums;
+      font-size: .85rem; opacity: .9;
+    }
+    .lb-group { display: flex; gap: 4px; align-items: center; }
+    .lb-stage {
+      flex: 1 1 auto;
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+    }
+    .lb-stage.dragging { cursor: grabbing; }
+    .lb-stage img {
+      position: absolute;
+      top: 0; left: 0;
+      transform-origin: 0 0;
+      will-change: transform;
+      max-width: none;
+      box-shadow: 0 10px 40px rgba(0,0,0,.6);
+      background: #fff;
+      pointer-events: none;
+    }
+    .lb-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 64px;
+      background: rgba(0,0,0,.45);
+      color: #fff; font-size: 28px;
+      border: 0; cursor: pointer;
+      border-radius: 6px;
+      z-index: 2;
+    }
+    .lb-nav:hover { background: rgba(0,0,0,.7); }
+    .lb-nav.prev { left: 10px; }
+    .lb-nav.next { right: 10px; }
+    .lb-nav:disabled { opacity: .25; cursor: default; }
+    .lb-foot {
+      flex: 0 0 auto;
+      padding: 8px 14px;
+      font-size: .8rem; color: rgba(255,255,255,.75);
+      background: rgba(20,24,30,.95);
+      border-top: 1px solid rgba(255,255,255,.1);
+      display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .lb-foot kbd {
+      font-family: inherit;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 4px;
+      padding: 0 5px;
+      font-size: .75rem;
+    }
+    @media (max-width: 640px) {
+      .lb-foot .hint { display: none; }
+      .lb-title { flex-basis: 100%; }
+    }
+
+    footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 24px 16px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <a class="back" href="index.html">&larr; All walkthroughs</a>
+    <h1>AWS S3 Bucket Basic Walkthrough</h1>
+    <p>Screenshots of the full bucket lifecycle in the AWS Console, from an empty account to creating, listing, uploading, emptying and deleting a bucket. Each step shows the equivalent <code>s3_manager.py</code> command.</p>
+    <div class="meta">
+      <span><strong>Region:</strong> Asia Pacific (Mumbai) ap-south-1</span>
+      <span><strong>Bucket:</strong> aws-s3-buckets-oct-2-2026-bucket</span>
+      <span><strong>Captured:</strong> 2 Oct 2026</span>
+      <span><strong>Images:</strong> 10</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+<nav class="toc" aria-label="Contents" id="toc">
+  <details open>
+    <summary>Contents</summary>
+    <div class="group">Create</div>
+    <ol>
+      <li><a href="#step-1"><span class="n">1</span><span>S3 landing page</span></a></li>
+      <li><a href="#step-2"><span class="n">2</span><span>Create bucket form</span></a></li>
+      <li><a href="#step-3"><span class="n">3</span><span>Bucket created</span></a></li>
+    </ol>
+    <div class="group">View</div>
+    <ol>
+      <li><a href="#step-4"><span class="n">4</span><span>Bucket list</span></a></li>
+      <li><a href="#step-5"><span class="n">5</span><span>Upload files and folders</span></a></li>
+    </ol>
+    <div class="group">Delete</div>
+    <ol>
+      <li><a href="#step-6"><span class="n">6</span><span>Select bucket to delete</span></a></li>
+      <li><a href="#step-7"><span class="n">7</span><span>Delete blocked: bucket not empty</span></a></li>
+      <li><a href="#step-8"><span class="n">8</span><span>Empty bucket</span></a></li>
+      <li><a href="#step-9"><span class="n">9</span><span>Delete bucket confirmation</span></a></li>
+      <li><a href="#step-10"><span class="n">10</span><span>Bucket deleted</span></a></li>
+    </ol>
+    <div class="summary-link">
+      <a href="#cli-summary"><span class="n">&#8225;</span><span>Console to CLI summary</span></a>
+    </div>
+  </details>
+</nav>
+
+<main>
+
+  <!-- ===================== CREATE ===================== -->
+  <h2 class="phase">Create</h2>
+
+  <section class="step" id="step-1">
+    <div class="step-head">
+      <div class="step-num">1</div>
+      <div>
+        <h3>S3 landing page</h3>
+        <p>Starting point. The account has no general purpose buckets yet.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-landing-page.png" alt="Amazon S3 Buckets page showing zero general purpose buckets and a Create bucket button" loading="lazy">
+        <figcaption>aws-s3-buckets-landing-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>What you see</h4>
+        <ul>
+          <li>General purpose buckets tab with count (0).</li>
+          <li>Account snapshot and External access summary panels on the right.</li>
+          <li>Orange <strong>Create bucket</strong> button starts the flow.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py list</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-2">
+    <div class="step-head">
+      <div class="step-num">2</div>
+      <div>
+        <h3>Create bucket form</h3>
+        <p>Name the bucket and review the default security settings before creating it.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-create-page.png" alt="Create bucket form with general configuration, object ownership, block public access, versioning, tags and encryption sections" loading="lazy">
+        <figcaption>aws-s3-buckets-create-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>Settings chosen</h4>
+        <ul>
+          <li><strong>Region:</strong> ap-south-1 (Mumbai).</li>
+          <li><strong>Bucket type:</strong> General purpose, global namespace.</li>
+          <li><strong>Name:</strong> aws-s3-buckets-oct-2-2026-bucket.</li>
+          <li><strong>Object ownership:</strong> ACLs disabled (bucket owner enforced).</li>
+          <li><strong>Block all public access:</strong> enabled <span class="tag">recommended</span></li>
+          <li><strong>Versioning:</strong> disabled.</li>
+          <li><strong>Encryption:</strong> SSE-S3 with Bucket Key enabled.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py --region ap-south-1 \
+  create aws-s3-buckets-oct-2-2026-bucket</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-3">
+    <div class="step-head">
+      <div class="step-num">3</div>
+      <div>
+        <h3>Bucket created</h3>
+        <p>Green banner confirms success and the console opens the empty bucket's Objects tab.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-created-page.png" alt="Success banner reading Successfully created bucket, with the bucket's empty Objects tab" loading="lazy">
+        <figcaption>aws-s3-buckets-created-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>What you see</h4>
+        <ul>
+          <li>Tabs for Objects, Metadata, Properties, Permissions, Metrics, Management, File systems and Access Points.</li>
+          <li>Objects (0): the bucket is empty.</li>
+          <li><strong>Upload</strong> and <strong>Create folder</strong> actions available.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py detail aws-s3-buckets-oct-2-2026-bucket</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VIEW ===================== -->
+  <h2 class="phase">View</h2>
+
+  <section class="step" id="step-4">
+    <div class="step-head">
+      <div class="step-num">4</div>
+      <div>
+        <h3>Bucket list</h3>
+        <p>Back on the Buckets page the new bucket appears with its region and creation timestamp.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-list-page.png" alt="Buckets list showing one bucket in ap-south-1 created October 2, 2026" loading="lazy">
+        <figcaption>aws-s3-buckets-list-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>Columns</h4>
+        <ul>
+          <li><strong>Name:</strong> aws-s3-buckets-oct-2-2026-bucket</li>
+          <li><strong>AWS Region:</strong> Asia Pacific (Mumbai) ap-south-1</li>
+          <li><strong>Creation date:</strong> October 2, 2026, 12:32:34 (UTC+05:30)</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py list
+python s3_manager.py list --json</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-5">
+    <div class="step-head">
+      <div class="step-num">5</div>
+      <div>
+        <h3>Upload files and folders</h3>
+        <p>A single PNG is staged for upload to the bucket root.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-files-folders-upload-page.png" alt="Upload page with one PNG file staged, destination s3://aws-s3-buckets-oct-2-2026" loading="lazy">
+        <figcaption>aws-s3-buckets-files-folders-upload-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>What you see</h4>
+        <ul>
+          <li>Drag-and-drop area, plus <strong>Add files</strong> and <strong>Add folder</strong>.</li>
+          <li>Staged file: Screenshot From 2026-07-25 12-52-45.png, image/png, 76.6 KB.</li>
+          <li>Collapsible Permissions and Properties sections (storage class, encryption, tags).</li>
+          <li>Files over 160 GB must go through the CLI, SDK or REST API.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py upload aws-s3-buckets-oct-2-2026-bucket \
+  "Screenshot From 2026-07-25 12-52-45.png"</code></pre>
+        <h4>Note</h4>
+        <ul>
+          <li>Uploading makes the bucket non-empty, which is why the delete in step 7 is blocked.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DELETE ===================== -->
+  <h2 class="phase">Delete</h2>
+
+  <section class="step" id="step-6">
+    <div class="step-head">
+      <div class="step-num">6</div>
+      <div>
+        <h3>Select bucket to delete</h3>
+        <p>Selecting the bucket row enables the Copy ARN, Empty and Delete buttons.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-delete-page.png" alt="Buckets list with the bucket row selected and the Delete button enabled" loading="lazy">
+        <figcaption>aws-s3-buckets-delete-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>What you see</h4>
+        <ul>
+          <li>Radio button on the bucket row is checked (1/1 selected).</li>
+          <li><strong>Empty</strong> and <strong>Delete</strong> become active.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code># Confirm what the bucket holds before acting on it
+python s3_manager.py detail aws-s3-buckets-oct-2-2026-bucket
+
+# Console "Empty" button  -&gt;  empty
+# Console "Delete" button -&gt;  delete</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-7">
+    <div class="step-head">
+      <div class="step-num">7</div>
+      <div>
+        <h3>Delete blocked: bucket not empty <span class="tag warn">error</span></h3>
+        <p>S3 refuses to delete a bucket that still contains objects.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-empty-and-delete-page.png" alt="Delete bucket page with red error This bucket is not empty and an Empty bucket button" loading="lazy">
+        <figcaption>aws-s3-buckets-empty-and-delete-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>What you see</h4>
+        <ul>
+          <li>Red alert: <em>This bucket is not empty. Buckets must be empty before they can be deleted.</em></li>
+          <li>Confirmation input and <strong>Delete bucket</strong> button are disabled.</li>
+          <li><strong>Empty bucket</strong> shortcut leads to step 8.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py delete aws-s3-buckets-oct-2-2026-bucket
+# AWS error (BucketNotEmpty): The bucket you tried to
+# delete is not empty</code></pre>
+        <ul>
+          <li>Same rule as the console: the bucket must be emptied first (step 8), or pass <code>--force</code> to do both in one go.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-8">
+    <div class="step-head">
+      <div class="step-num">8</div>
+      <div>
+        <h3>Empty bucket</h3>
+        <p>Type <em>permanently delete</em> to remove every object in the bucket.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-permanently-delete-files-to-delete-bucket-page.png" alt="Empty bucket page with warning list and confirmation input containing permanently delete" loading="lazy">
+        <figcaption>aws-s3-permanently-delete-files-to-delete-bucket-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>Warnings shown</h4>
+        <ul>
+          <li>Emptying cannot be undone.</li>
+          <li>Objects added during the operation may also be deleted.</li>
+          <li>For large buckets, a lifecycle rule is a more efficient way to purge objects.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code># Console "Empty": remove every object and version, keep the bucket
+python s3_manager.py empty aws-s3-buckets-oct-2-2026-bucket
+# prompts: Permanently delete ALL objects in bucket '...'? [y/N]
+
+# Or empty and delete in one step
+python s3_manager.py delete aws-s3-buckets-oct-2-2026-bucket --force</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-9">
+    <div class="step-head">
+      <div class="step-num">9</div>
+      <div>
+        <h3>Delete bucket confirmation</h3>
+        <p>With the bucket empty, type the bucket name to confirm deletion.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-buckets-delete-confirmation-page.png" alt="Delete bucket page with the bucket name typed in the confirmation field and the Delete bucket button enabled" loading="lazy">
+        <figcaption>aws-s3-buckets-delete-confirmation-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>Warnings shown</h4>
+        <ul>
+          <li>Deleting a bucket cannot be undone.</li>
+          <li>Bucket names are globally unique; another account can reuse the name afterwards.</li>
+          <li>Access points and Multi-Region Access Points referencing this bucket will fail.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py delete aws-s3-buckets-oct-2-2026-bucket
+# prompts: Delete bucket '...'? [y/N]</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="step-10">
+    <div class="step-head">
+      <div class="step-num">10</div>
+      <div>
+        <h3>Bucket deleted</h3>
+        <p>Green banner confirms deletion and the bucket list is empty again.</p>
+      </div>
+    </div>
+    <div class="step-body">
+      <figure>
+        <img src="aws_s3_buckets_config_images/aws-s3-bucikets-deleted-information-page.png" alt="Buckets page with success banner Successfully deleted bucket and zero buckets listed" loading="lazy">
+        <figcaption>aws-s3-bucikets-deleted-information-page.png</figcaption>
+      </figure>
+      <div class="notes">
+        <h4>What you see</h4>
+        <ul>
+          <li>Banner: <em>Successfully deleted bucket "aws-s3-buckets-oct-2-2026-bucket"</em>.</li>
+          <li>General purpose buckets (0): back to the starting state.</li>
+        </ul>
+        <h4>CLI equivalent</h4>
+        <pre><code>python s3_manager.py list
+# No buckets found.</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== SUMMARY ===================== -->
+  <section class="summary" id="cli-summary">
+    <h2 style="margin-top:0">Console action to CLI command</h2>
+    <table>
+      <thead>
+        <tr><th>Console action</th><th>Steps</th><th>s3_manager.py command</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>View bucket list</td><td>1, 4, 10</td><td><code>list</code></td></tr>
+        <tr><td>Create bucket</td><td>2, 3</td><td><code>--region ap-south-1 create &lt;name&gt;</code></td></tr>
+        <tr><td>Inspect bucket settings</td><td>3</td><td><code>detail &lt;name&gt;</code></td></tr>
+        <tr><td>Change versioning, tags, public access, encryption</td><td>2</td><td><code>update &lt;name&gt; ...</code></td></tr>
+        <tr><td>Upload a file</td><td>5</td><td><code>upload &lt;name&gt; &lt;file&gt;</code></td></tr>
+        <tr><td>Empty bucket (keep it)</td><td>8</td><td><code>empty &lt;name&gt;</code></td></tr>
+        <tr><td>Empty bucket then delete</td><td>7, 8, 9</td><td><code>delete &lt;name&gt; --force</code></td></tr>
+        <tr><td>Delete empty bucket</td><td>9</td><td><code>delete &lt;name&gt;</code></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+</div>
+
+<footer>Screenshots captured from the AWS Management Console. Click any image to enlarge.</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Screenshot viewer">
+  <div class="lb-bar">
+    <div class="lb-title" id="lb-title"></div>
+    <div class="lb-group">
+      <button class="lb-btn" id="lb-zoom-out" title="Zoom out (-)" aria-label="Zoom out">&minus;</button>
+      <div class="lb-zoom" id="lb-zoom-level">100%</div>
+      <button class="lb-btn" id="lb-zoom-in" title="Zoom in (+)" aria-label="Zoom in">+</button>
+    </div>
+    <div class="lb-group">
+      <button class="lb-btn" id="lb-fit" title="Fit to screen (F)">Fit</button>
+      <button class="lb-btn" id="lb-actual" title="Actual size (1)">1:1</button>
+      <a class="lb-btn" id="lb-newtab" href="#" target="_blank" rel="noopener" title="Open image in a new tab" style="display:inline-flex;align-items:center;text-decoration:none">New tab</a>
+    </div>
+    <button class="lb-btn primary" id="lb-close" title="Close (Esc)" aria-label="Close">&times;</button>
+  </div>
+
+  <div class="lb-stage" id="lb-stage">
+    <button class="lb-nav prev" id="lb-prev" title="Previous (&larr;)" aria-label="Previous screenshot">&#8249;</button>
+    <img id="lb-img" src="" alt="" draggable="false">
+    <button class="lb-nav next" id="lb-next" title="Next (&rarr;)" aria-label="Next screenshot">&#8250;</button>
+  </div>
+
+  <div class="lb-foot">
+    <span id="lb-counter"></span>
+    <span class="hint">
+      Scroll or pinch to zoom &middot; drag to pan &middot; double-click to toggle zoom &middot;
+      <kbd>+</kbd> <kbd>-</kbd> <kbd>F</kbd> <kbd>1</kbd> <kbd>&larr;</kbd> <kbd>&rarr;</kbd> <kbd>Esc</kbd>
+    </span>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var lb      = document.getElementById('lightbox');
+    var stage   = document.getElementById('lb-stage');
+    var img     = document.getElementById('lb-img');
+    var title   = document.getElementById('lb-title');
+    var counter = document.getElementById('lb-counter');
+    var zoomLbl = document.getElementById('lb-zoom-level');
+    var newTab  = document.getElementById('lb-newtab');
+    var btnPrev = document.getElementById('lb-prev');
+    var btnNext = document.getElementById('lb-next');
+
+    var MIN_SCALE = 0.1, MAX_SCALE = 8, STEP = 1.25;
+
+    // Build the list of screenshots from the page, in order.
+    var items = [];
+    document.querySelectorAll('section.step').forEach(function (sec) {
+      var el = sec.querySelector('figure img');
+      var h  = sec.querySelector('h3');
+      if (el) items.push({ src: el.getAttribute('src'), alt: el.alt, title: h ? h.textContent.trim() : el.alt });
+    });
+
+    var index = 0;
+    var scale = 1, tx = 0, ty = 0;      // current transform
+    var natW = 0, natH = 0;             // natural image size
+
+    function apply() {
+      img.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + scale + ')';
+      zoomLbl.textContent = Math.round(scale * 100) + '%';
+    }
+
+    function clampScale(s) { return Math.min(MAX_SCALE, Math.max(MIN_SCALE, s)); }
+
+    function fit() {
+      var sw = stage.clientWidth, sh = stage.clientHeight;
+      if (!natW || !natH) return;
+      scale = clampScale(Math.min(sw / natW, sh / natH, 1));
+      tx = (sw - natW * scale) / 2;
+      ty = (sh - natH * scale) / 2;
+      apply();
+    }
+
+    function actualSize() { zoomTo(1, stage.clientWidth / 2, stage.clientHeight / 2); }
+
+    // Zoom so that the stage point (px, py) stays fixed under the cursor.
+    function zoomTo(newScale, px, py) {
+      newScale = clampScale(newScale);
+      var k = newScale / scale;
+      tx = px - (px - tx) * k;
+      ty = py - (py - ty) * k;
+      scale = newScale;
+      apply();
+    }
+    function zoomBy(factor, px, py) {
+      if (px === undefined) { px = stage.clientWidth / 2; py = stage.clientHeight / 2; }
+      zoomTo(scale * factor, px, py);
+    }
+
+    function show(i) {
+      index = (i + items.length) % items.length;
+      var it = items[index];
+      title.textContent = 'Step ' + (index + 1) + ': ' + it.title;
+      counter.textContent = (index + 1) + ' / ' + items.length;
+      newTab.href = it.src;
+      img.alt = it.alt;
+      img.style.visibility = 'hidden';
+      img.onload = function () {
+        natW = img.naturalWidth; natH = img.naturalHeight;
+        fit();
+        img.style.visibility = 'visible';
+      };
+      img.src = it.src;
+      btnPrev.disabled = items.length < 2;
+      btnNext.disabled = items.length < 2;
+    }
+
+    function open(i) {
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      show(i);
+    }
+    function close() {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+      img.src = '';
+    }
+
+    // Open from page thumbnails
+    document.querySelectorAll('section.step').forEach(function (sec, i) {
+      var el = sec.querySelector('figure img');
+      if (el) el.addEventListener('click', function () { open(i); });
+    });
+
+    // Toolbar
+    document.getElementById('lb-close').addEventListener('click', close);
+    document.getElementById('lb-zoom-in').addEventListener('click', function () { zoomBy(STEP); });
+    document.getElementById('lb-zoom-out').addEventListener('click', function () { zoomBy(1 / STEP); });
+    document.getElementById('lb-fit').addEventListener('click', fit);
+    document.getElementById('lb-actual').addEventListener('click', actualSize);
+    btnPrev.addEventListener('click', function (e) { e.stopPropagation(); show(index - 1); });
+    btnNext.addEventListener('click', function (e) { e.stopPropagation(); show(index + 1); });
+
+    // Wheel zoom toward cursor
+    stage.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      var r = stage.getBoundingClientRect();
+      var factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+      zoomBy(factor, e.clientX - r.left, e.clientY - r.top);
+    }, { passive: false });
+
+    // Double-click: toggle between fit and 2x at cursor
+    stage.addEventListener('dblclick', function (e) {
+      var r = stage.getBoundingClientRect();
+      var px = e.clientX - r.left, py = e.clientY - r.top;
+      var fitScale = Math.min(stage.clientWidth / natW, stage.clientHeight / natH, 1);
+      if (Math.abs(scale - fitScale) < 0.01) zoomTo(Math.max(2, fitScale * 2.5), px, py);
+      else fit();
+    });
+
+    // Pointer-based pan and pinch
+    var pointers = new Map();
+    var dragStart = null;
+    var pinchStart = null;
+
+    stage.addEventListener('pointerdown', function (e) {
+      if (e.target.closest('.lb-nav')) return;
+      stage.setPointerCapture(e.pointerId);
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size === 1) {
+        dragStart = { x: e.clientX, y: e.clientY, tx: tx, ty: ty };
+        stage.classList.add('dragging');
+      } else if (pointers.size === 2) {
+        var p = Array.from(pointers.values());
+        var r = stage.getBoundingClientRect();
+        pinchStart = {
+          dist: Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y),
+          scale: scale,
+          cx: (p[0].x + p[1].x) / 2 - r.left,
+          cy: (p[0].y + p[1].y) / 2 - r.top
+        };
+        dragStart = null;
+      }
+    });
+
+    stage.addEventListener('pointermove', function (e) {
+      if (!pointers.has(e.pointerId)) return;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size === 2 && pinchStart) {
+        var p = Array.from(pointers.values());
+        var d = Math.hypot(p[0].x - p[1].x, p[0].y - p[1].y);
+        zoomTo(pinchStart.scale * (d / pinchStart.dist), pinchStart.cx, pinchStart.cy);
+      } else if (pointers.size === 1 && dragStart) {
+        tx = dragStart.tx + (e.clientX - dragStart.x);
+        ty = dragStart.ty + (e.clientY - dragStart.y);
+        apply();
+      }
+    });
+
+    function endPointer(e) {
+      pointers.delete(e.pointerId);
+      if (pointers.size < 2) pinchStart = null;
+      if (pointers.size === 0) { dragStart = null; stage.classList.remove('dragging'); }
+    }
+    stage.addEventListener('pointerup', endPointer);
+    stage.addEventListener('pointercancel', endPointer);
+
+    // Keyboard
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      switch (e.key) {
+        case 'Escape':      close(); break;
+        case '+': case '=': zoomBy(STEP); break;
+        case '-': case '_': zoomBy(1 / STEP); break;
+        case 'f': case 'F': fit(); break;
+        case '1':           actualSize(); break;
+        case '0':           fit(); break;
+        case 'ArrowLeft':   show(index - 1); break;
+        case 'ArrowRight':  show(index + 1); break;
+        default: return;
+      }
+      e.preventDefault();
+    });
+
+    // Re-fit when the window is resized while open
+    window.addEventListener('resize', function () {
+      if (lb.classList.contains('open')) fit();
+    });
+  })();
+
+  // Sidebar: highlight the step currently in view
+  (function () {
+    var links = Array.prototype.slice.call(document.querySelectorAll('#toc a[href^="#"]'));
+    var byId = {};
+    links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+    var targets = Object.keys(byId).map(function (id) { return document.getElementById(id); }).filter(Boolean);
+    if (!targets.length || !('IntersectionObserver' in window)) return;
+
+    var current = null;
+    function setActive(id) {
+      if (id === current) return;
+      current = id;
+      links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + id); });
+      var a = byId[id];
+      if (a && a.scrollIntoView) a.scrollIntoView({ block: 'nearest' });
+    }
+
+    var visible = {};
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { visible[e.target.id] = e.isIntersecting ? e.boundingClientRect.top : null; });
+      var best = null, bestTop = Infinity;
+      targets.forEach(function (t) {
+        var top = visible[t.id];
+        if (top !== null && top !== undefined && Math.abs(top) < Math.abs(bestTop)) { best = t.id; bestTop = top; }
+      });
+      if (best) setActive(best);
+    }, { rootMargin: '-20% 0px -60% 0px', threshold: [0, 0.25, 0.5, 1] });
+    targets.forEach(function (t) { io.observe(t); });
+
+    // Also react to hash navigation
+    window.addEventListener('hashchange', function () {
+      var id = location.hash.slice(1);
+      if (byId[id]) setActive(id);
+    });
+    if (location.hash && byId[location.hash.slice(1)]) setActive(location.hash.slice(1));
+  })();
+</script>
+
+</body>
+</html>

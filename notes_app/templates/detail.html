@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{ note.title }}{% endblock %}
+{% block bodyclass %}page-detail{% endblock %}
+
+{% block content %}
+<nav class="crumbs"><a href="/">All notes</a> <span>/</span> <span>{{ note.title }}</span></nav>
+
+<div class="page-head">
+  <div>
+    <h1>{{ note.title }}</h1>
+    <div class="meta">
+      {% for t in note.tags %}<a class="tag" href="/?tag={{ t }}">{{ t }}</a>{% endfor %}
+      <span class="muted">Created {{ note.created_display }}</span>
+      <span class="muted">Updated {{ note.updated_display }}</span>
+    </div>
+  </div>
+  <div class="actions">
+    <a href="/notes/{{ note.id }}/edit" class="btn primary">Edit</a>
+    <button class="btn danger" id="btn-delete" data-id="{{ note.id }}" data-title="{{ note.title }}">Delete</button>
+  </div>
+</div>
+
+<article class="markdown-body card" id="rendered"></article>
+<script id="note-data" type="application/json">{{ note|tojson }}</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='detail.js') }}"></script>
+{% endblock %}

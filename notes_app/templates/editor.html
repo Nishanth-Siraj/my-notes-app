@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == 'create' %}New note{% else %}Edit: {{ note.title }}{% endif %}{% endblock %}
+{% block bodyclass %}page-editor{% endblock %}
+{% block containerclass %}wide{% endblock %}
+
+{% block content %}
+<nav class="crumbs">
+  <a href="/">All notes</a> <span>/</span>
+  {% if mode == 'create' %}<span>New note</span>{% else %}<a href="/notes/{{ note.id }}">{{ note.title }}</a> <span>/</span> <span>Edit</span>{% endif %}
+</nav>
+
+<div class="editor-head">
+  <input type="text" id="title" placeholder="Note title" autocomplete="off" value="{{ note.title if note else '' }}">
+  <input type="text" id="tags" placeholder="tags, comma, separated" autocomplete="off" value="{{ note.tags|join(', ') if note else '' }}">
+  <span class="status" id="status">{% if mode == 'create' %}Not saved yet{% else %}Saved{% endif %}</span>
+  <button class="btn primary" id="btn-save" title="Save (Ctrl+S)">{% if mode == 'create' %}Create{% else %}Save{% endif %}</button>
+  {% if mode == 'create' %}
+  <a class="btn ghost" href="/">Cancel</a>
+  {% else %}
+  <a class="btn" href="/notes/{{ note.id }}" id="btn-done">Done</a>
+  {% endif %}
+</div>
+
+<div class="toolbar" id="toolbar">
+  <div class="group">
+    <button data-md="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+    <button data-md="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+    <button data-md="h1" title="Heading 1">H1</button>
+    <button data-md="h2" title="Heading 2">H2</button>
+    <button data-md="h3" title="Heading 3">H3</button>
+  </div>
+  <div class="group">
+    <button data-md="code" title="Inline code (Ctrl+`)">&lt;/&gt;</button>
+    <button data-md="codeblock" title="Code block (Ctrl+Shift+K)">{ } Code block</button>
+    <select id="code-lang" title="Language for new code blocks">
+      <option value="">plain</option>
+      <option value="python" selected>python</option>
+      <option value="bash">bash</option>
+      <option value="json">json</option>
+      <option value="yaml">yaml</option>
+      <option value="html">html</option>
+      <option value="css">css</option>
+      <option value="javascript">javascript</option>
+      <option value="sql">sql</option>
+      <option value="dockerfile">dockerfile</option>
+    </select>
+  </div>
+  <div class="group">
+    <button data-md="ul" title="Bullet list">&bull; List</button>
+    <button data-md="ol" title="Numbered list">1. List</button>
+    <button data-md="quote" title="Quote">&ldquo; Quote</button>
+    <button data-md="hr" title="Divider">&mdash;</button>
+    <button data-md="link" title="Link (Ctrl+K)">Link</button>
+    <button data-md="table" title="Table">Table</button>
+  </div>
+  <div class="group">
+    <button id="btn-image" title="Insert image (upload)">&#128247; Image</button>
+    <input type="file" id="file-input" accept="image/*" multiple hidden>
+  </div>
+  <div class="group right">
+    <button data-view="edit" title="Editor only">Edit</button>
+    <button data-view="split" class="active" title="Editor + preview">Split</button>
+    <button data-view="preview" title="Preview only">Preview</button>
+  </div>
+</div>
+
+<div class="panes view-split" id="panes">
+  <div class="pane pane-edit">
+    <textarea id="content" placeholder="Write in Markdown. Drop or paste images here. Use ``` for code blocks." spellcheck="false">{{ note.content if note else '' }}</textarea>
+    <div class="drop-hint" id="drop-hint">Drop images to upload</div>
+  </div>
+  <div class="pane pane-preview">
+    <article class="preview markdown-body" id="preview"></article>
+  </div>
+</div>
+
+<script id="note-data" type="application/json">{{ (note or {})|tojson }}</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', path='editor.js') }}"></script>
+{% endblock %}

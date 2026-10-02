@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notes login</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+</head>
+<body>
+  <div class="login-wrap">
+    <form class="login" method="post">
+      <h1>Notes</h1>
+      {% if error %}<p class="err">{{ error }}</p>{% endif %}
+      <input type="password" name="password" placeholder="Password" autofocus required>
+      <button class="btn primary" type="submit">Open notes</button>
+    </form>
+  </div>
+</body>
+</html>

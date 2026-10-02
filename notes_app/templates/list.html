@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}All notes{% endblock %}
+{% block bodyclass %}page-list{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>All notes</h1>
+    <p class="muted">{{ notes|length }} note{{ '' if notes|length == 1 else 's' }}{% if q %} matching “{{ q }}”{% endif %}{% if active_tag %} tagged <b>{{ active_tag }}</b>{% endif %}</p>
+  </div>
+  <a href="/notes/new" class="btn primary">+ New note</a>
+</div>
+
+<form class="filters" method="get" action="/">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search title, content or tags…" autocomplete="off">
+  {% if active_tag %}<input type="hidden" name="tag" value="{{ active_tag }}">{% endif %}
+  <button class="btn" type="submit">Search</button>
+  {% if q or active_tag %}<a class="btn ghost" href="/">Clear</a>{% endif %}
+</form>
+
+{% if tags %}
+<div class="tag-row">
+  {% for t in tags %}
+  <a class="chip {% if t.tag == active_tag %}active{% endif %}"
+     href="/?tag={{ '' if t.tag == active_tag else t.tag }}{% if q %}&q={{ q }}{% endif %}">{{ t.tag }} <span>{{ t.count }}</span></a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if notes %}
+<div class="note-grid">
+  {% for n in notes %}
+  <a class="note-card" href="/notes/{{ n.id }}">
+    <h2>{{ n.title }}</h2>
+    <p class="snippet">{{ n.snippet or 'Empty note' }}</p>
+    <div class="card-foot">
+      <span class="muted">{{ n.updated_display }}</span>
+      <span class="tags">{% for t in n.tags %}<span class="tag">{{ t }}</span>{% endfor %}</span>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <p>{% if q or active_tag %}No notes match.{% else %}You have no notes yet.{% endif %}</p>
+  <a href="/notes/new" class="btn primary">Create your first note</a>
+</div>
+{% endif %}
+{% endblock %}

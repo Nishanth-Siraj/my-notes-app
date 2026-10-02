@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+*.pyc
+notes_app/notes.db
+notes_app/uploads/
