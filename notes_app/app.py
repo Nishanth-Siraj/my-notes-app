@@ -304,6 +304,29 @@ def list_tags(db: Session = Depends(get_db)):
     return tag_counts(db)
 
 
+@app.get("/api/search/suggest", dependencies=[Depends(require_login)])
+def search_suggest(q: str = "", db: Session = Depends(get_db)):
+    """Return up to 8 suggestions: matching note titles + matching tags."""
+    if not q or len(q) < 1:
+        return {"titles": [], "tags": []}
+    like = f"%{q.lower()}%"
+    # titles matching anywhere in title
+    titles = (
+        db.query(Note.id, Note.title)
+        .filter(Note.title.ilike(like))
+        .order_by(Note.updated_at.desc())
+        .limit(6)
+        .all()
+    )
+    # tags matching q
+    tc = tag_counts(db)
+    matched_tags = [t["tag"] for t in tc if q.lower() in t["tag"].lower()][:6]
+    return {
+        "titles": [{"id": r.id, "title": r.title} for r in titles],
+        "tags": matched_tags,
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Pages
 # --------------------------------------------------------------------------- #

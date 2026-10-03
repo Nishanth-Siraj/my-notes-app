@@ -120,9 +120,10 @@ h1 { margin: 0; font-size: 1.6rem; line-height: 1.25; }
 .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
 
 /* ---------------- List page ---------------- */
-.filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.filters { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: flex-start; }
+.filters .search-wrap { flex: 1 1 260px; }
 .filters input[type=search] {
-  flex: 1 1 260px; padding: 8px 12px;
+  width: 100%; box-sizing: border-box; padding: 8px 12px;
   border: 1px solid var(--border); border-radius: 6px; background: var(--surface);
 }
 .note-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
@@ -523,3 +524,26 @@ body.focus-mode .panes { border-radius: 0; margin-bottom: 0; }
 /* ---- Lucide icons ---- */
 .nav-icon { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; stroke-width: 2; }
 .btn-icon { display: inline-block; width: 13px; height: 13px; vertical-align: -2px; margin-right: 3px; stroke-width: 2.5; }
+
+/* ---- search suggest dropdown ---- */
+.search-wrap { position: relative; flex: 1; min-width: 0; }
+.search-wrap input[type="search"] { width: 100%; box-sizing: border-box; }
+.search-suggest {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  z-index: 400; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  overflow: hidden;
+}
+.sg-hdr {
+  padding: 6px 14px 4px; font-size: .72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+}
+.sg-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px; cursor: pointer; font-size: .9rem; color: var(--text);
+}
+.sg-item:hover, .sg-item.active { background: var(--surface-2); }
+.sg-icon { width: 14px; height: 14px; flex-shrink: 0; opacity: .5; }
+.sg-item mark { background: none; color: var(--accent); font-weight: 700; padding: 0; }
+.sg-tag { font-size: .85rem; color: var(--muted); }
+.sg-tag mark { color: var(--accent); }

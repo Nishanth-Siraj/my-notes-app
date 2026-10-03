@@ -12,7 +12,10 @@
 </div>
 
 <form class="filters" method="get" action="/">
-  <input type="search" name="q" value="{{ q }}" placeholder="Search title, content or tags…" autocomplete="off">
+  <div class="search-wrap">
+    <input type="search" id="search-q" name="q" value="{{ q }}" placeholder="Search title, content or tags…" autocomplete="off">
+    <div class="search-suggest" id="search-suggest" hidden></div>
+  </div>
   {% if active_tag %}<input type="hidden" name="tag" value="{{ active_tag }}">{% endif %}
   <button class="btn" type="submit">Search</button>
   {% if q or active_tag %}<a class="btn ghost" href="/">Clear</a>{% endif %}
@@ -46,4 +49,94 @@
   <a href="/notes/new" class="btn primary">Create your first note</a>
 </div>
 {% endif %}
+
+{% block scripts %}
+<script>
+(function () {
+  var inp = document.getElementById('search-q');
+  var box = document.getElementById('search-suggest');
+  if (!inp || !box) return;
+  var timer, idx = -1;
+
+  function debounce(fn, ms) { clearTimeout(timer); timer = setTimeout(fn, ms); }
+
+  function fetchSuggest(q) {
+    if (!q || q.length < 1) { hide(); return; }
+    window.Notes.api('GET', '/api/search/suggest?q=' + encodeURIComponent(q))
+      .then(function (data) { render(data, q); })
+      .catch(function () { hide(); });
+  }
+
+  function render(data, q) {
+    var titles = data.titles || [], tags = data.tags || [];
+    if (!titles.length && !tags.length) { hide(); return; }
+    box.innerHTML = '';
+    idx = -1;
+
+    if (titles.length) {
+      var hdr = document.createElement('div');
+      hdr.className = 'sg-hdr'; hdr.textContent = 'Notes';
+      box.appendChild(hdr);
+      titles.forEach(function (t) {
+        var d = document.createElement('div');
+        d.className = 'sg-item sg-title';
+        d.innerHTML = '<svg class="sg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>' + hl(t.title, q);
+        d.dataset.href = '/notes/' + t.id;
+        box.appendChild(d);
+      });
+    }
+    if (tags.length) {
+      var hdr2 = document.createElement('div');
+      hdr2.className = 'sg-hdr'; hdr2.textContent = 'Tags';
+      box.appendChild(hdr2);
+      tags.forEach(function (tag) {
+        var d = document.createElement('div');
+        d.className = 'sg-item sg-tag';
+        d.innerHTML = '<svg class="sg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>' + hl(tag, q);
+        d.dataset.tag = tag;
+        box.appendChild(d);
+      });
+    }
+
+    box.querySelectorAll('.sg-item').forEach(function (el) {
+      el.addEventListener('mousedown', function (e) { e.preventDefault(); pick(el); });
+    });
+
+    box.removeAttribute('hidden');
+  }
+
+  function hl(text, q) {
+    var i = text.toLowerCase().indexOf(q.toLowerCase());
+    if (i < 0) return escHtml(text);
+    return escHtml(text.slice(0, i)) + '<mark>' + escHtml(text.slice(i, i + q.length)) + '</mark>' + escHtml(text.slice(i + q.length));
+  }
+  function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function pick(el) {
+    if (el.dataset.href) { location.href = el.dataset.href; return; }
+    if (el.dataset.tag) { location.href = '/?tag=' + encodeURIComponent(el.dataset.tag); return; }
+  }
+
+  function hide() { box.setAttribute('hidden', ''); idx = -1; }
+
+  inp.addEventListener('input', function () { debounce(function () { fetchSuggest(inp.value.trim()); }, 180); });
+
+  inp.addEventListener('keydown', function (e) {
+    var items = box.querySelectorAll('.sg-item');
+    if (box.hasAttribute('hidden') || !items.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault(); idx = Math.min(idx + 1, items.length - 1);
+      items.forEach(function (el, i) { el.classList.toggle('active', i === idx); });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault(); idx = Math.max(idx - 1, 0);
+      items.forEach(function (el, i) { el.classList.toggle('active', i === idx); });
+    } else if (e.key === 'Enter' && idx >= 0 && items[idx]) {
+      e.preventDefault(); pick(items[idx]);
+    } else if (e.key === 'Escape') { hide(); }
+  });
+
+  inp.addEventListener('blur', function () { setTimeout(hide, 160); });
+  inp.addEventListener('focus', function () { if (inp.value.trim()) fetchSuggest(inp.value.trim()); });
+})();
+</script>
 {% endblock %}
