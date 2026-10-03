@@ -260,11 +260,36 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.error { background: var(--again); }
 
+/* ---------- bottom tab bar ---------- */
+.bottom-nav {
+  display: none; /* desktop: hidden */
+}
+
 /* ---------- mobile ---------- */
 @media (max-width: 640px) {
-  .toolbar { grid-template-columns: auto 1fr auto; padding: 6px 10px; }
-  .tb-center { gap: 16px; }
-  .tb-side.right form { display: none; }
+  /* top bar: just brand + right side, no center nav */
+  .toolbar { grid-template-columns: auto 1fr; padding: 6px 14px; }
+  .tb-center { display: none; }
+  .tb-side.right { justify-self: end; }
+
+  /* bottom tab bar */
+  .bottom-nav {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
+    background: var(--bar-bg, #232f3e);
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding: 6px 0 max(6px, env(safe-area-inset-bottom));
+  }
+  .bn-tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: rgba(255,255,255,.55); text-decoration: none; font-size: 10px;
+    padding: 4px 2px; transition: color .15s;
+  }
+  .bn-tab i { width: 20px; height: 20px; stroke-width: 1.8; }
+  .bn-tab.current, .bn-tab:hover { color: #fff; }
+  .bn-tab.current i { stroke-width: 2.5; }
+
+  /* push page content above bottom bar */
+  .anki-main { padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
   .anki-main { padding: 14px 12px 40px; }
   .anki-main.with-bottombar { padding-bottom: 120px; }
   .qa .card-content { font-size: 18px; }

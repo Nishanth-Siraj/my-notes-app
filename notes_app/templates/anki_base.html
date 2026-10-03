@@ -37,6 +37,25 @@
   </div>
 </div>
 
+<!-- Bottom tab bar (mobile only) -->
+<nav class="bottom-nav" aria-label="Main navigation">
+  <a href="/quiz" class="bn-tab {% block bnav_decks %}{% endblock %}">
+    <i data-lucide="layers"></i><span>Decks</span>
+  </a>
+  <a href="/quiz/add" class="bn-tab {% block bnav_add %}{% endblock %}">
+    <i data-lucide="plus-circle"></i><span>Add</span>
+  </a>
+  <a href="/quiz/browse" class="bn-tab {% block bnav_browse %}{% endblock %}">
+    <i data-lucide="search"></i><span>Browse</span>
+  </a>
+  <a href="/quiz/stats" class="bn-tab {% block bnav_stats %}{% endblock %}">
+    <i data-lucide="bar-chart-2"></i><span>Stats</span>
+  </a>
+  <a href="/" class="bn-tab">
+    <i data-lucide="file-text"></i><span>Notes</span>
+  </a>
+</nav>
+
 <main class="anki-main {% block mainclass %}{% endblock %}">
   {% block content %}{% endblock %}
 </main>
