@@ -56,6 +56,17 @@ window.Notes = (function () {
     var raw = marked.parse(md || '');
     target.innerHTML = DOMPurify.sanitize(raw, { ADD_ATTR: ['target'] });
     target.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = '_blank'; a.rel = 'noopener'; });
+    // GitHub-style callouts: > [!NOTE] / [!TIP] / [!IMPORTANT] / [!WARNING] / [!CAUTION]
+    target.querySelectorAll('blockquote').forEach(function (bq) {
+      var p = bq.querySelector('p'); if (!p) return;
+      var m = p.innerHTML.match(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*(<br>)?/i); if (!m) return;
+      var kind = m[1].toLowerCase();
+      p.innerHTML = p.innerHTML.substring(m[0].length);
+      bq.classList.add('callout', 'callout-' + kind);
+      var t = document.createElement('div'); t.className = 'callout-title'; t.textContent = kind.charAt(0).toUpperCase() + kind.slice(1);
+      bq.insertBefore(t, bq.firstChild);
+    });
+    target.querySelectorAll('li > input[type=checkbox]').forEach(function (cb) { cb.closest('li').classList.add('task'); });
     target.querySelectorAll('table').forEach(function (t) {
       if (t.parentElement.classList.contains('scroll-x')) return;
       var w = document.createElement('div'); w.className = 'scroll-x'; t.parentNode.insertBefore(w, t); w.appendChild(t);

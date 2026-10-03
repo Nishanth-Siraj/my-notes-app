@@ -23,11 +23,34 @@
 
 <div class="toolbar" id="toolbar">
   <div class="group">
+    <button data-md="undo" title="Undo (Ctrl+Z)">&#8630;</button>
+    <button data-md="redo" title="Redo (Ctrl+Shift+Z)">&#8631;</button>
+  </div>
+  <div class="group">
+    <select id="heading" title="Text style">
+      <option value="">Style</option>
+      <option value="p">Paragraph</option>
+      <option value="1">Heading 1</option><option value="2">Heading 2</option><option value="3">Heading 3</option>
+      <option value="4">Heading 4</option><option value="5">Heading 5</option><option value="6">Heading 6</option>
+    </select>
+  </div>
+  <div class="group">
     <button data-md="bold" title="Bold (Ctrl+B)"><b>B</b></button>
     <button data-md="italic" title="Italic (Ctrl+I)"><i>I</i></button>
-    <button data-md="h1" title="Heading 1">H1</button>
-    <button data-md="h2" title="Heading 2">H2</button>
-    <button data-md="h3" title="Heading 3">H3</button>
+    <button data-md="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+    <button data-md="strike" title="Strikethrough (Ctrl+Shift+X)"><s>S</s></button>
+    <button data-md="highlight" title="Highlight (Ctrl+Shift+H)"><mark>H</mark></button>
+    <button data-md="sup" title="Superscript">x<sup>2</sup></button>
+    <button data-md="sub" title="Subscript">x<sub>2</sub></button>
+    <button data-md="kbd" title="Keyboard key"><kbd>Ctrl</kbd></button>
+    <button data-md="clear" title="Clear formatting">T&#824;</button>
+  </div>
+  <div class="group">
+    <button data-md="ul" title="Bullet list">&bull; List</button>
+    <button data-md="ol" title="Numbered list">1. List</button>
+    <button data-md="task" title="Checklist">&#9745; Tasks</button>
+    <button data-md="outdent" title="Outdent (Shift+Tab)">&#8676;</button>
+    <button data-md="indent" title="Indent (Tab)">&#8677;</button>
   </div>
   <div class="group">
     <button data-md="code" title="Inline code (Ctrl+`)">&lt;/&gt;</button>
@@ -36,32 +59,74 @@
       <option value="">plain</option>
       <option value="python" selected>python</option>
       <option value="bash">bash</option>
+      <option value="shell">shell</option>
       <option value="json">json</option>
       <option value="yaml">yaml</option>
+      <option value="toml">toml</option>
+      <option value="ini">ini</option>
+      <option value="dockerfile">dockerfile</option>
+      <option value="sql">sql</option>
+      <option value="javascript">javascript</option>
+      <option value="typescript">typescript</option>
       <option value="html">html</option>
       <option value="css">css</option>
-      <option value="javascript">javascript</option>
-      <option value="sql">sql</option>
-      <option value="dockerfile">dockerfile</option>
+      <option value="xml">xml</option>
+      <option value="go">go</option>
+      <option value="rust">rust</option>
+      <option value="java">java</option>
+      <option value="c">c</option>
+      <option value="cpp">cpp</option>
+      <option value="csharp">csharp</option>
+      <option value="php">php</option>
+      <option value="ruby">ruby</option>
+      <option value="kotlin">kotlin</option>
+      <option value="swift">swift</option>
+      <option value="nginx">nginx</option>
+      <option value="makefile">makefile</option>
+      <option value="markdown">markdown</option>
+      <option value="diff">diff</option>
+      <option value="plaintext">plaintext</option>
     </select>
   </div>
   <div class="group">
-    <button data-md="ul" title="Bullet list">&bull; List</button>
-    <button data-md="ol" title="Numbered list">1. List</button>
     <button data-md="quote" title="Quote">&ldquo; Quote</button>
+    <select id="callout" title="Callout box">
+      <option value="">Callout</option>
+      <option value="NOTE">Note</option><option value="TIP">Tip</option><option value="IMPORTANT">Important</option>
+      <option value="WARNING">Warning</option><option value="CAUTION">Caution</option>
+    </select>
+    <button data-md="details" title="Collapsible section">&#9656; Toggle</button>
     <button data-md="hr" title="Divider">&mdash;</button>
-    <button data-md="link" title="Link (Ctrl+K)">Link</button>
-    <button data-md="table" title="Table">Table</button>
   </div>
   <div class="group">
-    <button id="btn-image" title="Insert image (upload)">&#128247; Image</button>
+    <button data-md="link" title="Link (Ctrl+K)">Link</button>
+    <button data-md="table" title="Table (choose size)">Table</button>
+    <button id="btn-image" title="Upload image (or paste / drop)">&#128247; Image</button>
+    <button data-md="imageurl" title="Image from URL">&#128279; Img URL</button>
+    <button data-md="date" title="Insert date and time">&#128197; Date</button>
     <input type="file" id="file-input" accept="image/*" multiple hidden>
   </div>
+  <div class="group">
+    <button data-md="find" title="Find &amp; replace (Ctrl+F)">&#128269; Find</button>
+    <button data-md="focus" title="Focus mode (F11-style, Esc to exit)">&#9974; Focus</button>
+  </div>
   <div class="group right">
+    <span class="wc" id="wordcount"></span>
     <button data-view="edit" title="Editor only">Edit</button>
     <button data-view="split" class="active" title="Editor + preview">Split</button>
     <button data-view="preview" title="Preview only">Preview</button>
   </div>
+</div>
+
+<div class="findbar" id="findbar" hidden>
+  <input type="text" id="find-q" placeholder="Find">
+  <input type="text" id="find-r" placeholder="Replace with">
+  <label class="chk"><input type="checkbox" id="find-case"> Aa</label>
+  <span class="muted" id="find-count"></span>
+  <button type="button" class="btn small" id="find-next">Next</button>
+  <button type="button" class="btn small" id="find-one">Replace</button>
+  <button type="button" class="btn small" id="find-all">Replace all</button>
+  <button type="button" class="btn small ghost" id="find-close">&times;</button>
 </div>
 
 <div class="panes view-split" id="panes">
