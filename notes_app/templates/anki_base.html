@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#232f3e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Azazel">
+  <link rel="apple-touch-icon" href="/static/icons/icon-180.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/icon-32.png">
+  <link rel="icon" type="image/x-icon" href="/static/icons/favicon.ico">
   <title>{% block title %}Anki{% endblock %} · Azazel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap">
@@ -61,5 +70,6 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 {% block scripts %}{% endblock %}
 <script>if(window.lucide)lucide.createIcons();</script>
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/static/sw.js');</script>
 </body>
 </html>
