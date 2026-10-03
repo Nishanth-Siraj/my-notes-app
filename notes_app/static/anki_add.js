@@ -110,4 +110,7 @@
     if (e.key === 'Escape') location.href = $('btn-close').href;
   });
   if (!cardId) $('question').focus();
+
+  // tag autocomplete
+  N.tagAutocomplete($('tags'), '/api/quiz/tags', ',');
 })();

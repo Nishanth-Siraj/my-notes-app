@@ -188,5 +188,103 @@ window.Notes = (function () {
     window.addEventListener('resize', function () { if (lb.classList.contains('open')) fit(); });
   }
 
-  return { api: api, toast: toast, esc: esc, renderMarkdown: renderMarkdown, bindMarkdownContainer: bindMarkdownContainer, openViewer: openViewer };
+  // ---------------------------------------------------------------- tag autocomplete
+  function tagAutocomplete(input, apiUrl, sep) {
+    if (!input) return;
+    var tags = null; // cached tag list [{name, count}]
+    var box = document.createElement("div");
+    box.className = "tag-suggest";
+    box.style.display = "none";
+    input.parentNode.style.position = "relative";
+    input.parentNode.appendChild(box);
+    var idx = -1;
+
+    function fetchTags() {
+      if (tags) return Promise.resolve(tags);
+      return api("GET", apiUrl).then(function (data) {
+        // data is {tag: count, ...}
+        tags = Object.keys(data).sort(function (a, b) { return data[b] - data[a]; });
+        return tags;
+      });
+    }
+
+    function currentToken() {
+      var v = input.value, pos = input.selectionStart || v.length;
+      // find token start: scan back from cursor for separator
+      var sepChar = sep === " " ? " " : ",";
+      var start = v.lastIndexOf(sepChar, pos - 1) + 1;
+      // skip leading whitespace
+      while (start < pos && v[start] === " ") start++;
+      return { start: start, end: pos, text: v.substring(start, pos).toLowerCase() };
+    }
+
+    function existingTags() {
+      var sepChar = sep === " " ? " " : ",";
+      return input.value.split(sepChar).map(function (t) { return t.trim().toLowerCase(); }).filter(Boolean);
+    }
+
+    function show(matches) {
+      if (!matches.length) { box.style.display = "none"; idx = -1; return; }
+      box.innerHTML = "";
+      var existing = existingTags();
+      var filtered = matches.filter(function (m) { return existing.indexOf(m.toLowerCase()) === -1; });
+      if (!filtered.length) { box.style.display = "none"; idx = -1; return; }
+      filtered.forEach(function (m, i) {
+        var d = document.createElement("div");
+        d.className = "tag-opt" + (i === idx ? " active" : "");
+        d.textContent = m;
+        d.addEventListener("mousedown", function (e) { e.preventDefault(); pick(m); });
+        box.appendChild(d);
+      });
+      box.style.display = "block";
+    }
+
+    function pick(tag) {
+      var tok = currentToken();
+      var v = input.value;
+      var joiner = sep === " " ? " " : ", ";
+      var before = v.substring(0, tok.start);
+      var after = v.substring(tok.end);
+      // add a trailing separator so user can keep typing
+      if (!after.trim()) after = joiner;
+      else if (sep !== " " && after[0] !== ",") after = joiner + after.trimStart();
+      input.value = before + tag + after;
+      input.selectionStart = input.selectionEnd = (before + tag + joiner).length;
+      box.style.display = "none";
+      idx = -1;
+      input.focus();
+      input.dispatchEvent(new Event("input"));
+    }
+
+    input.addEventListener("input", function () {
+      var tok = currentToken();
+      if (tok.text.length < 1) { box.style.display = "none"; idx = -1; return; }
+      fetchTags().then(function (all) {
+        var q = tok.text;
+        var matches = all.filter(function (t) { return t.toLowerCase().indexOf(q) !== -1; });
+        idx = -1;
+        show(matches);
+      });
+    });
+
+    input.addEventListener("keydown", function (e) {
+      var items = box.querySelectorAll(".tag-opt");
+      if (!items.length || box.style.display === "none") return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault(); idx = Math.min(idx + 1, items.length - 1);
+        items.forEach(function (el, i) { el.classList.toggle("active", i === idx); });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault(); idx = Math.max(idx - 1, 0);
+        items.forEach(function (el, i) { el.classList.toggle("active", i === idx); });
+      } else if (e.key === "Enter" || e.key === "Tab") {
+        if (idx >= 0 && items[idx]) { e.preventDefault(); pick(items[idx].textContent); }
+      } else if (e.key === "Escape") {
+        box.style.display = "none"; idx = -1;
+      }
+    });
+
+    input.addEventListener("blur", function () { setTimeout(function () { box.style.display = "none"; idx = -1; }, 150); });
+  }
+
+  return { api: api, toast: toast, esc: esc, renderMarkdown: renderMarkdown, bindMarkdownContainer: bindMarkdownContainer, openViewer: openViewer, tagAutocomplete: tagAutocomplete };
 })();

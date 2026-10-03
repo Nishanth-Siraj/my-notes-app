@@ -405,4 +405,7 @@
   });
 
   if (!noteId) titleEl.focus();
+
+  // tag autocomplete
+  N.tagAutocomplete(tagsEl, '/api/tags', ',');
 })();
