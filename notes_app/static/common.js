@@ -191,19 +191,28 @@ window.Notes = (function () {
   // ---------------------------------------------------------------- tag autocomplete
   function tagAutocomplete(input, apiUrl, sep) {
     if (!input) return;
-    var tags = null; // cached tag list [{name, count}]
+    var tags = null; // cached tag list (strings)
     var box = document.createElement("div");
     box.className = "tag-suggest";
     box.style.display = "none";
-    input.parentNode.style.position = "relative";
-    input.parentNode.appendChild(box);
+    // wrap input in a relative span so dropdown anchors exactly below it
+    var wrap = document.createElement("span");
+    wrap.className = "tag-wrap";
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+    wrap.appendChild(box);
     var idx = -1;
 
     function fetchTags() {
       if (tags) return Promise.resolve(tags);
       return api("GET", apiUrl).then(function (data) {
-        // data is {tag: count, ...}
-        tags = Object.keys(data).sort(function (a, b) { return data[b] - data[a]; });
+        // API returns [{tag, count}, ...] array
+        if (Array.isArray(data)) {
+          tags = data.map(function (d) { return d.tag || d.name || String(d); });
+        } else {
+          // fallback: plain {tag: count} object
+          tags = Object.keys(data).sort(function (a, b) { return data[b] - data[a]; });
+        }
         return tags;
       });
     }
