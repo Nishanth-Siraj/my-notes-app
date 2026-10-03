@@ -61,6 +61,10 @@
       var sel = ta.value.substring(ta.selectionStart, ta.selectionEnd);
       block(ta, '```' + lang.value + '\n' + (sel || '# code') + '\n```');
     });
+    sec.querySelector('[data-act="math"]').addEventListener('click', function () { wrap(ta, '$', '$', 'x^2'); });
+    sec.querySelector('[data-act="mathblock"]').addEventListener('click', function () {
+      var sel = ta.value.substring(ta.selectionStart, ta.selectionEnd); block(ta, '$$\n' + (sel || 'E = mc^2') + '\n$$');
+    });
     sec.querySelector('[data-act="image"]').addEventListener('click', function () { file.click(); });
     file.addEventListener('change', function () { upload(ta, file.files); file.value = ''; });
     pbtn.addEventListener('click', function () { prev.hidden = !prev.hidden; pbtn.classList.toggle('active', !prev.hidden); render(); });
@@ -77,6 +81,7 @@
       if (e.key === 'Tab') { e.preventDefault(); ta.setRangeText('    ', ta.selectionStart, ta.selectionEnd, 'end'); }
       if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); wrap(ta, '**', '**', 'bold'); }
       if ((e.ctrlKey || e.metaKey) && e.key === 'i') { e.preventDefault(); wrap(ta, '_', '_', 'italic'); }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'm' || e.key === 'M')) { e.preventDefault(); if (e.shiftKey) block(ta, '$$\n' + 'E = mc^2' + '\n$$'); else wrap(ta, '$', '$', 'x^2'); }
     });
   });
 

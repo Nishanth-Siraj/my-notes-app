@@ -107,6 +107,52 @@
     <input type="file" id="file-input" accept="image/*" multiple hidden>
   </div>
   <div class="group">
+    <select id="math" title="Insert math (LaTeX via KaTeX)">
+      <option value="">&sum; Math</option>
+      <option value="inline">Inline  $x$</option>
+      <option value="display">Display block  $$ $$</option>
+      <option value="frac">Fraction</option>
+      <option value="sqrt">Root</option>
+      <option value="pow">Power / index</option>
+      <option value="sum">Sum</option>
+      <option value="prod">Product</option>
+      <option value="int">Integral</option>
+      <option value="iint">Double integral</option>
+      <option value="oint">Contour integral</option>
+      <option value="lim">Limit</option>
+      <option value="deriv">Derivative</option>
+      <option value="partial">Partial derivative</option>
+      <option value="ode">Differential equation</option>
+      <option value="matrix">Matrix [ ]</option>
+      <option value="pmatrix">Matrix ( )</option>
+      <option value="det">Determinant</option>
+      <option value="cases">Piecewise / cases</option>
+      <option value="system">System of equations</option>
+      <option value="aligned">Multi-line aligned</option>
+      <option value="binom">Binomial</option>
+      <option value="vec">Vector</option>
+      <option value="norm">Norm / abs</option>
+      <option value="set">Set builder</option>
+      <option value="logic">Logic</option>
+      <option value="taylor">Series</option>
+      <option value="quad">Quadratic formula</option>
+      <option value="euler">Euler's identity</option>
+      <option value="prob">Probability / stats</option>
+      <option value="chem">Chemistry  \ce</option>
+      <option value="units">Units  \pu</option>
+    </select>
+    <select id="symbols" title="Insert a math symbol">
+      <option value="">&alpha; Symbols</option>
+      <optgroup label="Greek"><option value="\alpha">\alpha</option><option value="\beta">\beta</option><option value="\gamma">\gamma</option><option value="\delta">\delta</option><option value="\epsilon">\epsilon</option><option value="\varepsilon">\varepsilon</option><option value="\zeta">\zeta</option><option value="\eta">\eta</option><option value="\theta">\theta</option><option value="\vartheta">\vartheta</option><option value="\iota">\iota</option><option value="\kappa">\kappa</option><option value="\lambda">\lambda</option><option value="\mu">\mu</option><option value="\nu">\nu</option><option value="\xi">\xi</option><option value="\pi">\pi</option><option value="\rho">\rho</option><option value="\sigma">\sigma</option><option value="\tau">\tau</option><option value="\upsilon">\upsilon</option><option value="\phi">\phi</option><option value="\varphi">\varphi</option><option value="\chi">\chi</option><option value="\psi">\psi</option><option value="\omega">\omega</option><option value="\Gamma">\Gamma</option><option value="\Delta">\Delta</option><option value="\Theta">\Theta</option><option value="\Lambda">\Lambda</option><option value="\Xi">\Xi</option><option value="\Pi">\Pi</option><option value="\Sigma">\Sigma</option><option value="\Phi">\Phi</option><option value="\Psi">\Psi</option><option value="\Omega">\Omega</option></optgroup>
+      <optgroup label="Operators"><option value="\pm">\pm</option><option value="\mp">\mp</option><option value="\times">\times</option><option value="\div">\div</option><option value="\cdot">\cdot</option><option value="\ast">\ast</option><option value="\circ">\circ</option><option value="\bullet">\bullet</option><option value="\oplus">\oplus</option><option value="\otimes">\otimes</option><option value="\nabla">\nabla</option><option value="\partial">\partial</option><option value="\infty">\infty</option><option value="\propto">\propto</option></optgroup>
+      <optgroup label="Relations"><option value="=">=</option><option value="\neq">\neq</option><option value="\approx">\approx</option><option value="\equiv">\equiv</option><option value="\sim">\sim</option><option value="\simeq">\simeq</option><option value="\cong">\cong</option><option value="<"><</option><option value=">">></option><option value="\le">\le</option><option value="\ge">\ge</option><option value="\ll">\ll</option><option value="\gg">\gg</option><option value="\subset">\subset</option><option value="\subseteq">\subseteq</option><option value="\supset">\supset</option><option value="\supseteq">\supseteq</option><option value="\in">\in</option><option value="\notin">\notin</option><option value="\ni">\ni</option><option value="\perp">\perp</option><option value="\parallel">\parallel</option></optgroup>
+      <optgroup label="Sets & logic"><option value="\emptyset">\emptyset</option><option value="\cup">\cup</option><option value="\cap">\cap</option><option value="\setminus">\setminus</option><option value="\mathbb{R}">\mathbb{R}</option><option value="\mathbb{N}">\mathbb{N}</option><option value="\mathbb{Z}">\mathbb{Z}</option><option value="\mathbb{Q}">\mathbb{Q}</option><option value="\mathbb{C}">\mathbb{C}</option><option value="\forall">\forall</option><option value="\exists">\exists</option><option value="\nexists">\nexists</option><option value="\neg">\neg</option><option value="\land">\land</option><option value="\lor">\lor</option><option value="\implies">\implies</option><option value="\iff">\iff</option><option value="\therefore">\therefore</option><option value="\because">\because</option></optgroup>
+      <optgroup label="Arrows"><option value="\to">\to</option><option value="\gets">\gets</option><option value="\leftrightarrow">\leftrightarrow</option><option value="\Rightarrow">\Rightarrow</option><option value="\Leftarrow">\Leftarrow</option><option value="\Leftrightarrow">\Leftrightarrow</option><option value="\mapsto">\mapsto</option><option value="\uparrow">\uparrow</option><option value="\downarrow">\downarrow</option><option value="\rightleftharpoons">\rightleftharpoons</option><option value="\longrightarrow">\longrightarrow</option></optgroup>
+      <optgroup label="Accents & misc"><option value="\hat{x}">\hat{x}</option><option value="\bar{x}">\bar{x}</option><option value="\dot{x}">\dot{x}</option><option value="\ddot{x}">\ddot{x}</option><option value="\tilde{x}">\tilde{x}</option><option value="\vec{x}">\vec{x}</option><option value="\overline{AB}">\overline{AB}</option><option value="\angle">\angle</option><option value="\triangle">\triangle</option><option value="\degree">\degree</option><option value="\hbar">\hbar</option><option value="\ell">\ell</option><option value="\Re">\Re</option><option value="\Im">\Im</option><option value="\aleph">\aleph</option><option value="\dots">\dots</option><option value="\cdots">\cdots</option><option value="\vdots">\vdots</option><option value="\ddots">\ddots</option></optgroup>
+    </select>
+    <button data-md="mathhelp" title="Math syntax help">?</button>
+  </div>
+  <div class="group">
     <button data-md="find" title="Find &amp; replace (Ctrl+F)">&#128269; Find</button>
     <button data-md="focus" title="Focus mode (F11-style, Esc to exit)">&#9974; Focus</button>
   </div>

@@ -475,3 +475,10 @@ body.focus-mode .panes { border-radius: 0; margin-bottom: 0; }
   .toolbar .group { flex: 0 0 auto; }
   .toolbar .group.right { margin-left: 0; }
 }
+
+/* ---------- math (KaTeX) ---------- */
+.math-display { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 4px 0; -webkit-overflow-scrolling: touch; }
+.math-display .katex-display { margin: .6em 0; }
+.katex { font-size: 1.12em; }
+.katex-error { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85em; }
+#math, #symbols { max-width: 140px; }

@@ -358,3 +358,9 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
 /* toolbar spacing on narrow screens */
 .toolbar { column-gap: 12px; }
 @media (max-width: 400px) { .tb-center { gap: 12px; } .tb-side.left { font-size: 12px; } }
+
+/* ---------- math (KaTeX) ---------- */
+.math-display { overflow-x: auto; overflow-y: hidden; max-width: 100%; padding: 4px 0; -webkit-overflow-scrolling: touch; }
+.math-display .katex-display { margin: .6em 0; }
+.katex { font-size: 1.12em; }
+.katex-error { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85em; }

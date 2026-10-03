@@ -52,9 +52,50 @@ window.Notes = (function () {
   };
   marked.use({ renderer: renderer });
 
+  // ---------------------------------------------------------------- math (KaTeX)
+  // Supported: $inline$, $$display$$, \(inline\), \[display\], ```math fences,
+  // and bare \begin{equation|align|gather|multline|cases|matrix...} environments.
+  // Chemistry via \ce{...} and units via \pu{...} (mhchem). Code spans/blocks are left alone.
+  var MATH_MACROS = {
+    '\\R': '\\mathbb{R}', '\\N': '\\mathbb{N}', '\\Z': '\\mathbb{Z}', '\\Q': '\\mathbb{Q}', '\\C': '\\mathbb{C}',
+    '\\abs': '\\left|#1\\right|', '\\norm': '\\left\\lVert#1\\right\\rVert', '\\set': '\\left\\{#1\\right\\}',
+    '\\dd': '\\mathrm{d}', '\\e': '\\mathrm{e}'
+  };
+  function renderTex(tex, display) {
+    if (!window.katex) return '<code>' + esc(tex) + '</code>';
+    var html = katex.renderToString(tex, {
+      displayMode: display, throwOnError: false, strict: 'ignore', trust: false,
+      output: 'htmlAndMathml', macros: Object.assign({}, MATH_MACROS), maxExpand: 2000, errorColor: '#d13212'
+    });
+    return display ? '<div class="math-display" title="Copy the equation to get its LaTeX">' + html + '</div>' : html;
+  }
+  var ENV = '(equation|align|alignat|gather|multline|flalign|eqnarray|split|aligned|gathered|cases|rcases|matrix|pmatrix|bmatrix|Bmatrix|vmatrix|Vmatrix|smallmatrix|array|subarray|CD)';
+  function extractMath(md) {
+    var store = [];
+    function put(tex, display) { store.push(renderTex(tex.trim(), display)); return 'MATHPH' + (store.length - 1) + 'XQ'; }
+    // ```math / ```latex / ```tex fences become display math
+    md = md.replace(/^(```|~~~)[ \t]*(math|latex|tex|katex)[ \t]*\n([\s\S]*?)\n\1[ \t]*$/gm, function (_, f, l, tex) { return '\n' + put(tex, true) + '\n'; });
+    // leave other code fences and inline code untouched
+    var parts = md.split(/(^(?:```|~~~)[\s\S]*?^(?:```|~~~)[ \t]*$|`[^`\n]+`)/m);
+    for (var i = 0; i < parts.length; i += 2) {
+      parts[i] = parts[i]
+        .replace(/\$\$([\s\S]+?)\$\$/g, function (_, t) { return put(t, true); })
+        .replace(/\\\[([\s\S]+?)\\\]/g, function (_, t) { return put(t, true); })
+        .replace(new RegExp('\\\\begin\\{' + ENV + '(\\*?)\\}[\\s\\S]*?\\\\end\\{\\1\\2\\}', 'g'), function (m) { return put(m, true); })
+        .replace(/\\\(([\s\S]+?)\\\)/g, function (_, t) { return put(t, false); })
+        // $inline$: no space just inside the dollars, closing $ not followed by a digit (so "$5 and $10" stays text)
+        .replace(/(^|[^\\$])\$(?=\S)((?:\\\$|[^$\n])+?)(?<=\S)\$(?!\d)/g, function (_, pre, t) { return pre + put(t, false); });
+    }
+    return { md: parts.join(''), store: store };
+  }
+
   function renderMarkdown(target, md) {
-    var raw = marked.parse(md || '');
-    target.innerHTML = DOMPurify.sanitize(raw, { ADD_ATTR: ['target'] });
+    var m = extractMath(md || '');
+    var raw = marked.parse(m.md);
+    var clean = DOMPurify.sanitize(raw, { ADD_ATTR: ['target'] });
+    // KaTeX output is generated from escaped input (trust: false), so it is inserted after sanitizing
+    clean = clean.replace(/<p>\s*(MATHPH\d+XQ)\s*<\/p>/g, '$1').replace(/MATHPH(\d+)XQ/g, function (_, i) { return m.store[+i] || ''; });
+    target.innerHTML = clean;
     target.querySelectorAll('a[href^="http"]').forEach(function (a) { a.target = '_blank'; a.rel = 'noopener'; });
     // GitHub-style callouts: > [!NOTE] / [!TIP] / [!IMPORTANT] / [!WARNING] / [!CAUTION]
     target.querySelectorAll('blockquote').forEach(function (bq) {

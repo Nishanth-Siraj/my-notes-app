@@ -205,6 +205,58 @@
     insertBlock('> [!' + kind + ']\n' + body);
   });
 
+  // ------------------------------------------------------------ math
+  var MATH = {
+    frac: '\\frac{a}{b}', sqrt: '\\sqrt[n]{x}', pow: 'x^{n}_{i}', sum: '\\sum_{i=1}^{n} a_i', prod: '\\prod_{i=1}^{n} a_i',
+    int: '\\int_{a}^{b} f(x)\\,dx', iint: '\\iint_{D} f(x,y)\\,dA', oint: '\\oint_{C} \\vec{F}\\cdot d\\vec{r}',
+    lim: '\\lim_{x \\to \\infty} f(x)', deriv: '\\frac{d}{dx} f(x)', partial: '\\frac{\\partial f}{\\partial x}',
+    ode: "y'' + p(x)\\,y' + q(x)\\,y = g(x)",
+    matrix: '\\begin{bmatrix}\n a & b \\\\\n c & d\n\\end{bmatrix}', pmatrix: '\\begin{pmatrix}\n 1 & 0 & 0 \\\\\n 0 & 1 & 0 \\\\\n 0 & 0 & 1\n\\end{pmatrix}',
+    det: '\\begin{vmatrix}\n a & b \\\\\n c & d\n\\end{vmatrix} = ad - bc',
+    cases: 'f(x) = \\begin{cases}\n x^2 & \\text{if } x \\ge 0 \\\\\n -x & \\text{otherwise}\n\\end{cases}',
+    system: '\\begin{cases}\n 2x + 3y = 7 \\\\\n x - y = 1\n\\end{cases}',
+    aligned: '\\begin{aligned}\n (a+b)^2 &= (a+b)(a+b) \\\\\n &= a^2 + 2ab + b^2\n\\end{aligned}',
+    binom: '\\binom{n}{k} = \\frac{n!}{k!\\,(n-k)!}', vec: '\\vec{v} = \\langle v_1, v_2, v_3 \\rangle',
+    norm: '\\lVert \\vec{v} \\rVert = \\sqrt{v_1^2 + v_2^2}', set: '\\{\\, x \\in \\mathbb{R} \\mid x > 0 \\,\\}',
+    logic: '\\forall \\varepsilon > 0\; \\exists \\delta > 0 : |x - a| < \\delta \\implies |f(x) - L| < \\varepsilon',
+    taylor: 'e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!}', quad: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+    euler: 'e^{i\\pi} + 1 = 0', prob: 'P(A \\mid B) = \\frac{P(B \\mid A)\\,P(A)}{P(B)}, \\quad \\mathbb{E}[X] = \\sum_x x\\,p(x)',
+    chem: '\\ce{2H2 + O2 -> 2H2O}', units: '\\pu{9.81 m/s^2}'
+  };
+  // true when the cursor sits between an opening and closing $ / $$ (so raw LaTeX is inserted)
+  function insideMath() {
+    var before = contentEl.value.substring(0, contentEl.selectionStart).replace(/\\\$/g, '');
+    before = before.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+    var dd = (before.match(/\$\$/g) || []).length;
+    if (dd % 2) return true;
+    var single = (before.replace(/\$\$/g, '').match(/\$/g) || []).length;
+    return single % 2 === 1;
+  }
+  function insertMath(kind) {
+    var s = contentEl.selectionStart, e = contentEl.selectionEnd, sel = contentEl.value.substring(s, e);
+    if (kind === 'inline') { insertAtCursor('$', '$', 'x^2'); return; }
+    if (kind === 'display') { insertBlock('$$\n' + (sel || 'E = mc^2') + '\n$$', 3); return; }
+    var tex = MATH[kind]; if (!tex) return;
+    if (insideMath()) replaceRange(s, e, tex);
+    else insertBlock('$$\n' + tex + '\n$$');
+  }
+  $('math').addEventListener('change', function (ev) { var k = ev.target.value; ev.target.value = ''; if (k) insertMath(k); });
+  $('symbols').addEventListener('change', function (ev) {
+    var t = ev.target.value; ev.target.value = ''; if (!t) return;
+    var s = contentEl.selectionStart, e = contentEl.selectionEnd;
+    if (insideMath()) replaceRange(s, e, (/[a-zA-Z}]$/.test(t) ? t + ' ' : t));
+    else replaceRange(s, e, '$' + t + '$');
+  });
+  actions.mathhelp = function () {
+    insertBlock([
+      '<details>', '<summary>Math syntax cheat-sheet</summary>', '',
+      '- Inline: `$a^2 + b^2 = c^2$` gives $a^2 + b^2 = c^2$',
+      '- Display: put LaTeX between `$$` lines, or use a ```` ```math ```` fence',
+      '- Also accepted: `\\( ... \\)`, `\\[ ... \\]`, and `\\begin{align} ... \\end{align}`',
+      '- Chemistry: `$\\ce{H2SO4}$` gives $\\ce{H2SO4}$; units: `$\\pu{5 kg}$`',
+      '- A literal dollar sign: write `\\$`', '', '</details>'].join('\n'));
+  };
+
   // ------------------------------------------------------------ word count
   function updateCount() {
     var t = contentEl.value.replace(/```[\s\S]*?```/g, ' ').trim();
@@ -341,6 +393,7 @@
     else if (inEditor && e.key === 'k') { e.preventDefault(); actions.link(); }
     else if (inEditor && e.key === '`') { e.preventDefault(); actions.code(); }
     else if (inEditor && e.key === 'u') { e.preventDefault(); actions.underline(); }
+    else if (inEditor && (e.key === 'm' || e.key === 'M')) { e.preventDefault(); insertMath(e.shiftKey ? 'display' : 'inline'); }
     else if (inEditor && e.shiftKey && (e.key === 'X' || e.key === 'x')) { e.preventDefault(); actions.strike(); }
     else if (inEditor && e.shiftKey && (e.key === 'H' || e.key === 'h')) { e.preventDefault(); actions.highlight(); }
     else if (e.key === 'f' && !e.shiftKey) { e.preventDefault(); openFind(); }
