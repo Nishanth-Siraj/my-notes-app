@@ -16,12 +16,10 @@
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand tb-side left" href="/">Azazel</a>
-    <nav class="tb-center topnav">
-      <a href="/" class="{% if nav == 'notes' %}current{% endif %}"><i data-lucide="file-text" class="nav-icon"></i>Notes</a>
-      <a href="/quiz" class="{% if nav == 'quiz' %}current{% endif %}"><i data-lucide="layers" class="nav-icon"></i>Quiz</a>
-    </nav>
-    <div class="tb-side right">
+    <a class="brand" href="/">Azazel</a>
+    <nav class="topnav">
+      <a href="/" class="navlink {% if nav == 'notes' %}active{% endif %}"><i data-lucide="file-text" class="nav-icon"></i>Notes</a>
+      <a href="/quiz" class="navlink {% if nav == 'quiz' %}active{% endif %}"><i data-lucide="layers" class="nav-icon"></i>Quiz</a>
       {% if nav == 'quiz' %}
       <a href="/quiz/add" class="abtn primary"><i data-lucide="plus" class="btn-icon"></i>Card</a>
       {% else %}
@@ -30,7 +28,7 @@
       {% if has_password %}
       <form method="post" action="/logout" class="inline"><button class="linkbtn" type="submit"><i data-lucide="log-out" class="btn-icon"></i>Log out</button></form>
       {% endif %}
-    </div>
+    </nav>
   </div>
 </header>
 
