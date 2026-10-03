@@ -379,3 +379,7 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
 .math-display .katex-display { margin: .6em 0; }
 .katex { font-size: 1.12em; }
 .katex-error { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85em; }
+
+/* ---- Lucide icons ---- */
+.nav-icon { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; stroke-width: 2; }
+.btn-icon { display: inline-block; width: 13px; height: 13px; vertical-align: -2px; margin-right: 3px; stroke-width: 2.5; }

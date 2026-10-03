@@ -8,7 +8,7 @@
     <h1>All notes</h1>
     <p class="muted">{{ notes|length }} note{{ '' if notes|length == 1 else 's' }}{% if q %} matching “{{ q }}”{% endif %}{% if active_tag %} tagged <b>{{ active_tag }}</b>{% endif %}</p>
   </div>
-  <a href="/notes/new" class="btn primary">+ New note</a>
+  <a href="/notes/new" class="btn primary"><i data-lucide="plus" class="btn-icon"></i>New note</a>
 </div>
 
 <form class="filters" method="get" action="/">

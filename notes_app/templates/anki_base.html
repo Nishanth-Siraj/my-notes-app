@@ -17,14 +17,14 @@
 <div class="toolbar">
   <a class="tb-side left" href="/" title="Back to notes">Azazel</a>
   <nav class="tb-center">
-    <a href="/quiz" class="{% block nav_decks %}{% endblock %}">Decks</a>
-    <a href="/quiz/add" class="{% block nav_add %}{% endblock %}">Add</a>
-    <a href="/quiz/browse" class="{% block nav_browse %}{% endblock %}">Browse</a>
-    <a href="/quiz/stats" class="{% block nav_stats %}{% endblock %}">Stats</a>
+    <a href="/quiz" class="{% block nav_decks %}{% endblock %}"><i data-lucide="layers" class="nav-icon"></i>Decks</a>
+    <a href="/quiz/add" class="{% block nav_add %}{% endblock %}"><i data-lucide="plus-circle" class="nav-icon"></i>Add</a>
+    <a href="/quiz/browse" class="{% block nav_browse %}{% endblock %}"><i data-lucide="search" class="nav-icon"></i>Browse</a>
+    <a href="/quiz/stats" class="{% block nav_stats %}{% endblock %}"><i data-lucide="bar-chart-2" class="nav-icon"></i>Stats</a>
   </nav>
   <div class="tb-side right">
-    <a href="/">Notes</a>
-    {% if has_password %}<form method="post" action="/logout" class="inline"><button type="submit" class="linkbtn">Log out</button></form>{% endif %}
+    <a href="/"><i data-lucide="file-text" class="nav-icon"></i>Notes</a>
+    {% if has_password %}<form method="post" action="/logout" class="inline"><button type="submit" class="linkbtn"><i data-lucide="log-out" class="btn-icon"></i>Log out</button></form>{% endif %}
   </div>
 </div>
 
@@ -58,6 +58,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/mhchem.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/contrib/copy-tex.min.js"></script>
 <script src="{{ url_for('static', path='common.js') }}"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 {% block scripts %}{% endblock %}
+<script>if(window.lucide)lucide.createIcons();</script>
 </body>
 </html>

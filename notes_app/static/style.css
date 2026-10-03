@@ -5,7 +5,7 @@
   --text: #16191f;
   --muted: #5f6b7a;
   --border: #d5dbdb;
-  --accent: #ec7211;
+  --accent: #4f46e5;
   --accent-text: #ffffff;
   --link: #0972d3;
   --danger: #d13212;
@@ -23,8 +23,8 @@
     --text: #e8ebee;
     --muted: #9aa5b1;
     --border: #2f3843;
-    --accent: #ff9900;
-    --accent-text: #16191f;
+    --accent: #818cf8;
+    --accent-text: #ffffff;
     --link: #4da3ff;
     --danger: #ff6b4a;
     --code-bg: #0d1117;
@@ -499,3 +499,7 @@ body.focus-mode .panes { border-radius: 0; margin-bottom: 0; }
 .tag-opt:hover, .tag-opt.active {
   background: var(--accent); color: #fff;
 }
+
+/* ---- Lucide icons ---- */
+.nav-icon { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; stroke-width: 2; }
+.btn-icon { display: inline-block; width: 13px; height: 13px; vertical-align: -2px; margin-right: 3px; stroke-width: 2.5; }
