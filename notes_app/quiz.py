@@ -145,7 +145,13 @@ def apply_rating(card: Card, rating: str, custom_days: Optional[int] = None) -> 
     card.last_result = rating if rating != "custom" else "good"
     card.last_reviewed = now
     card.updated_at = now
-    card.due_at = now + (datetime.timedelta(days=days) if days > 0 else datetime.timedelta(minutes=RELEARN_MINUTES))
+    if days > 0:
+        # Schedule to midnight UTC on the target date, not 24h from now.
+        # This matches Anki: "1 day" means "available first thing tomorrow."
+        target_date = (now + datetime.timedelta(days=days)).date()
+        card.due_at = datetime.datetime(target_date.year, target_date.month, target_date.day, 0, 0, 0)
+    else:
+        card.due_at = now + datetime.timedelta(minutes=RELEARN_MINUTES)
     return days
 
 
