@@ -36,9 +36,10 @@ window.AnkiHeatmap = (function () {
       var maxPast = 0; Object.keys(hm.days).forEach(function (k) { maxPast = Math.max(maxPast, hm.days[k]); });
       var maxFut = fut ? Math.max.apply(null, fut.counts.concat([1])) : 1;
 
+      var todayKey = iso(today);
       var cells = '', months = '', lastMonth = -1, col = 0;
       for (var d = new Date(gridStart); d <= end; d = addDays(d, 1)) {
-        var key = iso(d), isFuture = d > today, isToday = d.getTime() === today.getTime();
+        var key = iso(d), isToday = (key === todayKey), isFuture = (key > todayKey);
         var cls = 'hm-cell', title;
         if (d < start) { cls += ' pad'; title = ''; }
         else if (isFuture) {
