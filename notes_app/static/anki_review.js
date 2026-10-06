@@ -184,5 +184,14 @@
     else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   });
 
+  // On phones the More menu lives in the top bar and opens downward
+  var mq = window.matchMedia('(max-width: 768px)'), more = $('more'), moreHome = more.parentNode;
+  function placeMore() {
+    if (mq.matches) { $('top-actions').appendChild(more); more.classList.remove('up'); }
+    else { moreHome.appendChild(more); more.classList.add('up'); }
+  }
+  placeMore();
+  if (mq.addEventListener) mq.addEventListener('change', placeMore);
+
   load();
 })();

@@ -10,9 +10,11 @@
   <a class="rv-back" href="{{ '/quiz/deck/' ~ deck if deck else '/quiz' }}">
     <i data-lucide="arrow-left"></i><span>{{ deck or tag or 'Study' }}</span>
   </a>
-  {% if deck %}
-  <a class="rv-settings" href="/quiz/deck/{{ deck }}"><i data-lucide="settings"></i><span>Settings</span></a>
-  {% endif %}
+  <div class="rv-top-actions" id="top-actions">
+    {% if deck %}
+    <a class="rv-settings" href="/quiz/deck/{{ deck }}"><i data-lucide="settings"></i><span>Settings</span></a>
+    {% endif %}
+  </div>
 </div>
 
 <div class="rv-progress-row">
@@ -81,5 +83,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', path='anki_review.js') }}?v=4"></script>
+<script src="{{ url_for('static', path='anki_review.js') }}?v=5"></script>
 {% endblock %}

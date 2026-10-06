@@ -999,3 +999,46 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
 
   body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
 }
+
+/* ---------- reviewer: top actions + mobile v4 ---------- */
+.rv-top-actions { display: flex; align-items: center; gap: 12px; }
+.rv-top-actions #more > summary { color: var(--fg); background: none; border: 0; box-shadow: none; padding: 8px; }
+.rv-top-actions #more > summary span { display: none; }
+.rv-top-actions #more > summary i { width: 24px; height: 24px; }
+.rv-top-actions #more .menu-items { top: calc(100% + 6px); right: 0; left: auto; transform: none; }
+@media (max-width: 768px) {
+  .rv-top { display: flex; margin: 0 0 14px; }
+  .rv-back { font-size: 20px; gap: 22px; }
+  .rv-back i { width: 26px; height: 26px; color: var(--fg); }
+  .rv-settings { border: 0; background: none; padding: 8px; }
+  .rv-settings i { width: 26px; height: 26px; }
+  .rv-top-actions { gap: 6px; }
+  .rv-progress { height: 12px; }
+  .rv-progress-fill { background: #4a5cf5; }
+
+  .rv-bar .show-answer, .rv-bar .show-answer:hover {
+    background: #161b26; color: var(--fg); border: 1.5px solid #3a4253;
+    width: 66%; padding: 18px 24px; font-size: 20px; font-weight: 400;
+  }
+  .rv-bar .show-answer i { width: 28px; height: 28px; }
+  .rv-show-go { display: none; }
+
+  .rv-bar.bottombar { grid-template-columns: 1.15fr 1fr 1.25fr auto; gap: 14px; }
+  .rv-btn { flex-direction: row; gap: 10px; padding: 16px 8px; font-size: 16px; border-radius: 10px; background: transparent; border: 1.5px solid #343b48; }
+  .rv-bar #btn-next { flex-direction: row-reverse; }
+  .rv-bar #btn-next:not(:disabled) { background: #7fdcb3; color: #0b2e22; border-color: transparent; font-size: 18px; }
+  .rv-bar #btn-next:disabled { background: transparent; }
+  .rv-bar .counts { border: 0; padding: 0 0 0 4px; font-size: 19px; }
+}
+
+/* deck overview: keep Custom Study menu on screen */
+@media (max-width: 768px) { .ov-custom-items { left: 0; right: auto; max-width: calc(100vw - 32px); } }
+@media (max-width: 768px) {
+  .rv-bar #btn-next, .rv-bar #btn-next:not(:disabled) { flex-direction: row-reverse; }
+  .rv-btn { font-size: 15px; gap: 8px; padding: 15px 6px; white-space: nowrap; }
+  .rv-btn i { flex-shrink: 0; width: 22px; height: 22px; }
+  .rv-bar #btn-next:not(:disabled) { font-size: 17px; }
+  .rv-bar.bottombar { gap: 10px; grid-template-columns: 1.3fr 1fr 1.2fr auto; }
+}
+@media (max-width: 768px) { .rv-bar .rv-btn { font-size: 15px; } .rv-bar #btn-next:not(:disabled) { font-size: 17px; } }
+@media (max-width: 768px) { .rv-bar .rv-btn svg { flex-shrink: 0; width: 22px; height: 22px; } .rv-bar .rv-btn { padding: 15px 4px; gap: 6px; } .rv-bar .counts { font-size: 17px; } }
