@@ -31,7 +31,7 @@
     <h2 class="stats-h2">Card Counts</h2>
     <p class="stats-sub">Overview of cards in your collection.</p>
   </div>
-  <div class="ov-stats" style="margin-top:16px">
+  <div class="ov-stats stats-counts-grid" style="margin-top:16px">
     <div class="ov-stat-card">
       <div class="ov-stat-icon blue"><i data-lucide="file-text"></i></div>
       <div><div class="ov-stat-label">New</div><div class="ov-stat-val">{{ counts.new }}</div></div>
@@ -61,7 +61,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', path='anki_heatmap.js') }}"></script>
+<script src="{{ url_for('static', path='anki_heatmap.js') }}?v=2"></script>
 <script>
 (function () {
   var N = window.Notes;
