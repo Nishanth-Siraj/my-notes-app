@@ -847,3 +847,50 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   .rv-bar .counts { font-size: 15px; }
   body.reviewer .anki-main.with-bottombar { padding-bottom: 260px; }
 }
+
+/* ---------- reviewer: mobile layout ---------- */
+.rv-show-go { display: none; }
+@media (max-width: 768px) {
+  .rv-top { display: none; }
+  body.reviewer .anki-main { padding-top: 16px; }
+  .rv-progress-row { margin-bottom: 20px; }
+  .rv-progress { height: 14px; background: #1e2638; }
+  .rv-progress-fill { background: #2f6bff; }
+  .rv-progress-txt { font-size: 15px; }
+  .rv-card { min-height: 52vh; background: #111827; border-color: #2c3a5c; border-radius: 16px; }
+  .rv-star { color: #9fb4ff; }
+
+  .rv-bar.bottombar {
+    left: 0; right: 0; bottom: calc(60px + env(safe-area-inset-bottom));
+    background: var(--bg); backdrop-filter: none; border: 0; border-radius: 0;
+    padding: 12px 16px 14px;
+    display: grid; grid-template-columns: 1fr 0.8fr 1fr auto; gap: 12px; align-items: center;
+  }
+  .rv-bar .bar-left, .rv-bar .bar-right { display: contents; }
+  .rv-bar .bar-center { order: 0; grid-column: 1 / -1; width: auto; }
+  .rv-bar #btn-prev { order: 1; } .rv-bar #btn-edit { order: 2; } .rv-bar #btn-next { order: 3; }
+  .rv-bar .counts { order: 4; font-size: 17px; padding-left: 4px; white-space: nowrap; }
+  .rv-bar #more { display: none; }
+
+  .rv-bar .show-answer {
+    position: relative; width: 100%; justify-content: center; gap: 16px;
+    padding: 18px 64px; font-size: 18px; border-radius: 14px; background: #2f5bff;
+  }
+  .rv-bar .show-answer i { width: 24px; height: 24px; }
+  .rv-show-go {
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,.14);
+  }
+
+  .rv-btn {
+    flex-direction: column; gap: 6px; padding: 12px 6px; font-size: 13px;
+    border-radius: 12px; background: #141a26; border-color: #2a3346; min-width: 0;
+  }
+  .rv-btn span, .rv-bar details.menu > summary span { display: inline; }
+  .rv-btn i { width: 22px; height: 22px; }
+  .rv-bar #btn-next { background: #dbe4ff; border-color: transparent; color: #2f5bff; }
+  .rv-bar #btn-next:disabled { background: #141a26; border-color: #2a3346; color: var(--fg); }
+  .rv-bar .answer-buttons .abtn { padding: 14px 4px; border-radius: 12px; }
+  body.reviewer .anki-main.with-bottombar { padding-bottom: 250px; }
+}
