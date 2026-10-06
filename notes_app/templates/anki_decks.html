@@ -27,7 +27,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="scroll-x">
 <table class="decks" id="decks">
   <thead>
     <tr>
@@ -59,7 +58,6 @@
   {% endfor %}
   </tbody>
 </table>
-</div>
 
 <p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% elif stats.due > 0 %}<span class="due-badge">{{ stats.due }} card{{ '' if stats.due == 1 else 's' }} due</span> — click a deck to start reviewing.{% else %}No cards are due today.{% endif %}</p>
 

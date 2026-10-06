@@ -143,7 +143,6 @@ kbd { font-family: inherit; font-size: .72em; color: var(--fg-subtle); margin-le
   margin-left: var(--sb-width);
   padding: 28px 32px 60px;
   min-width: 0;
-  max-width: 900px;
 }
 .anki-main.with-bottombar { padding-bottom: 110px; }
 
@@ -168,8 +167,9 @@ table.decks th.name { text-align: left; }
 table.decks td { padding: 10px 12px; border-bottom: 1px solid rgba(48,54,61,.6); }
 table.decks td.name { text-align: left; }
 table.decks td.count { text-align: right; width: 60px; font-variant-numeric: tabular-nums; }
-table.decks a.deck { color: var(--fg); font-size: 15px; font-weight: 500; }
+table.decks a.deck { color: var(--fg); font-size: 15px; font-weight: 500; display: block; }
 table.decks a.deck:hover { color: #fff; text-decoration: none; }
+table.decks td.name { cursor: pointer; }
 table.decks tr:hover td { background: rgba(255,255,255,.03); }
 table.decks .gear { width: 32px; text-align: right; position: relative; }
 .new { color: var(--new); }
