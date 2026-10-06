@@ -9,7 +9,7 @@
 <div class="sb-stats">
   <div class="sb-stat">
     <span class="sb-label">DUE</span>
-    <span class="due">{{ ns.due + ns.new + ns.learn }}</span>
+    <span class="due">{{ ns.due }}</span>
   </div>
   <div class="sb-stat">
     <span class="sb-label">NEW</span>
@@ -61,7 +61,7 @@
   </tbody>
 </table>
 
-<p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% elif stats.due > 0 %}<span class="due-badge">{{ stats.due }} card{{ '' if stats.due == 1 else 's' }} due</span> — click a deck to start reviewing.{% else %}No cards are due today.{% endif %}</p>
+<p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% if ns.due + ns.learn > 0 %} <span class="due-badge">{{ ns.due + ns.learn }} still due.</span>{% endif %}{% elif ns.due + ns.learn > 0 %}<span class="due-badge">{{ ns.due }} review{% if ns.learn %} + {{ ns.learn }} learning{% endif %} due</span> — click a deck to start reviewing.{% else %}No cards are due today.{% endif %}</p>
 
 <!-- Review heatmap -->
 <section class="heatmap-wrap" id="heatmap" data-days="365"></section>
