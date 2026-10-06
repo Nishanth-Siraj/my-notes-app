@@ -954,3 +954,48 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   body.reviewer .anki-main.with-bottombar { padding-bottom: 320px; }
 }
 @media (max-width: 768px) { .rv-bar .show-answer { display: flex; margin: 0 auto; } .rv-bar .show-answer[hidden] { display: none; } }
+
+/* ---------- reviewer: desktop v2 ---------- */
+@media (min-width: 769px) {
+  body.reviewer .anki-main { padding: 24px 40px 0; }
+  .rv-top, .rv-progress-row { max-width: none; }
+  .rv-top { margin-bottom: 22px; }
+  .rv-back { font-size: 17px; gap: 22px; }
+  .rv-back i { width: 22px; height: 22px; color: var(--fg); }
+  .rv-settings { padding: 12px 18px; font-size: 15px; border-radius: 10px; gap: 12px; }
+  .rv-settings i { width: 22px; height: 22px; }
+  .rv-progress { height: 14px; }
+  .rv-progress-fill { background: #2f5bff; }
+  .rv-progress-txt { font-size: 16px; }
+
+  .rv-card { background: transparent; border: 0; box-shadow: none; min-height: 0; max-width: 1180px; }
+  .rv-star, .rv-hint, .rv-hint[hidden] { display: none; }
+  .rv-card-body { padding: 56px 0 24px; }
+  .rv-card #question { font-size: 32px; font-weight: 400; line-height: 1.45; }
+  .rv-card .card-content p { max-width: 780px; margin-left: auto; margin-right: auto; }
+  .rv-card .card-content img { display: block; margin: 40px auto 8px; max-width: 100%; max-height: 52vh; border-radius: 14px; border: 1px solid #2c3a5c; }
+
+  .rv-bar.bottombar {
+    left: var(--sb-width); right: 0; bottom: 0;
+    background: #141821; backdrop-filter: none;
+    border: 0; border-top: 1px solid var(--border); border-radius: 0;
+    padding: 24px;
+  }
+  .rv-btn, .rv-bar details.menu > summary { padding: 15px 24px; font-size: 18px; gap: 14px; border-radius: 10px; background: transparent; border-color: #343b48; }
+  .rv-btn span { display: inline; }
+  .rv-btn i { width: 24px; height: 24px; }
+  .rv-bar .bar-right { gap: 24px; }
+  .rv-bar #more > summary { padding: 15px 20px; }
+  .rv-bar #more > summary span { display: none; }
+  .rv-bar .counts { font-size: 18px; margin-left: 10px; }
+
+  .rv-bar .show-answer { background: #e6e9f0; color: #111827; font-weight: 500; font-size: 18px; padding: 16px 30px; border-radius: 10px; gap: 16px; }
+  .rv-bar .show-answer i { width: 26px; height: 26px; }
+  .rv-bar .show-answer:hover { background: #fff; }
+
+  .rv-bar #btn-next { flex-direction: row-reverse; padding: 15px 36px; }
+  .rv-bar #btn-next:not(:disabled) { background: #5fd3a3; color: #0b2e22; border-color: transparent; }
+  .rv-bar #btn-next:not(:disabled):hover { background: #74e0b3; }
+
+  body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
+}
