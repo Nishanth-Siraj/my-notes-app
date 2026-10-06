@@ -20,6 +20,7 @@
   <span class="rv-progress-txt" id="progress-txt">0 / 0</span>
 </div>
 
+{% if all or forgotten %}<p class="rv-practice"><i data-lucide="flask-conical"></i>Custom study: practice only, your review dates won't change</p>{% endif %}
 <div id="loading" class="center muted">Loading…</div>
 
 <div id="card" class="rv-card qa" hidden>
@@ -55,10 +56,11 @@
   <div class="bar-center">
     <button class="abtn primary show-answer" id="btn-show"><i data-lucide="eye"></i><span>Show Answer</span><span class="rv-show-go"><i data-lucide="arrow-right"></i></span></button>
     <div class="answer-buttons" id="answer-buttons" hidden>
-      <div class="ab"><span class="ivl" id="ivl-again"></span><button class="abtn again" data-rating="again">Again</button></div>
-      <div class="ab"><span class="ivl" id="ivl-hard"></span><button class="abtn hard" data-rating="hard">Hard</button></div>
-      <div class="ab"><span class="ivl" id="ivl-good"></span><button class="abtn good" data-rating="good">Good</button></div>
-      <div class="ab"><span class="ivl" id="ivl-easy"></span><button class="abtn easy" data-rating="easy">Easy</button></div>
+      <div class="ab"><span class="ivl" id="ivl-again"></span><button class="abtn again" data-rating="again"><i data-lucide="rotate-cw"></i><span>Again</span></button></div>
+      <div class="ab"><span class="ivl" id="ivl-hard"></span><button class="abtn hard" data-rating="hard"><i data-lucide="bar-chart-2"></i><span>Hard</span></button></div>
+      <div class="ab"><span class="ivl" id="ivl-good"></span><button class="abtn good" data-rating="good"><i data-lucide="check-circle-2"></i><span>Good</span></button></div>
+      <div class="ab"><span class="ivl" id="ivl-easy"></span><button class="abtn easy" data-rating="easy"><i data-lucide="zap"></i><span>Easy</span></button></div>
+      <div class="ab"><span class="ivl">days</span><button class="abtn custom" id="btn-custom" type="button"><i data-lucide="calendar-days"></i><span>Custom</span></button></div>
     </div>
   </div>
   <div class="bar-right">
@@ -79,5 +81,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', path='anki_review.js') }}?v=2"></script>
+<script src="{{ url_for('static', path='anki_review.js') }}?v=4"></script>
 {% endblock %}

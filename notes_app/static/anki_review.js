@@ -8,6 +8,7 @@
   var queue = [], index = 0, current = null, revealed = false, busy = false;
   var seen = {}, counts = { again: 0, hard: 0, good: 0, easy: 0 };
   var RELEARN_GAP = 2;
+  var PRACTICE = !!(cfg.all || cfg.forgotten);
 
   var qEl = $('question'), aEl = $('answer');
   N.bindMarkdownContainer(qEl); N.bindMarkdownContainer(aEl);
@@ -39,7 +40,16 @@
     $('progress').style.width = (total ? 100 * pos / total : 0) + '%';
     $('progress-txt').textContent = pos + ' / ' + total;
     $('btn-prev').disabled = index === 0;
-    $('btn-next').disabled = index >= total - 1;
+    $('btn-next').disabled = !(queue[index] && queue[index]._rated);
+  }
+
+  function paintRated() {
+    var r = current && current._rated;
+    document.querySelectorAll('#answer-buttons [data-rating]').forEach(function (b) {
+      b.classList.toggle('picked', b.dataset.rating === r);
+      b.disabled = !!r;
+    });
+    $('answer-buttons').classList.toggle('locked', !!r);
   }
 
   function isMarked() { return current && (current.tags || []).indexOf('marked') !== -1; }
@@ -52,6 +62,8 @@
     $('answer').hidden = true; $('answer-sep').hidden = true;
     $('btn-show').hidden = false; $('answer-buttons').hidden = true; $('hint').hidden = false;
     paintStar();
+    if (current._rated) { revealed = false; showAnswer(); }
+    paintRated();
     ['again', 'hard', 'good', 'easy'].forEach(function (r) { $('ivl-' + r).textContent = ivl(current.preview[r]); });
     $('btn-edit').href = '/quiz/cards/' + current.id + '/edit';
     $('card').hidden = false; $('done').hidden = true;
@@ -73,7 +85,11 @@
     index = i; show();
   }
   $('btn-prev').addEventListener('click', function () { go(-1); });
-  $('btn-next').addEventListener('click', function () { go(1); });
+  function next() {
+    if (!current || !current._rated) return;
+    if (index + 1 >= queue.length) finish(); else go(1);
+  }
+  $('btn-next').addEventListener('click', next);
   $('btn-star').addEventListener('click', function () {
     if (!current) return;
     var tags = (current.tags || []).filter(function (t) { return t !== 'marked'; });
@@ -86,15 +102,22 @@
   });
 
   function rate(rating, days) {
-    if (!revealed || busy || !current) return;
+    if (!revealed || busy || !current || current._rated) return;
+    if (PRACTICE) {
+      if (!seen[current.id] && counts[rating] !== undefined) counts[rating] += 1;
+      seen[current.id] = true;
+      current._rated = rating;
+      paintRated(); updateCounts();
+      return;
+    }
     busy = true;
     var body = { rating: rating }; if (rating === 'custom') body.days = days;
     N.api('POST', '/api/cards/' + current.id + '/review', body).then(function (updated) {
       if (!seen[current.id] && counts[rating] !== undefined) counts[rating] += 1;
       seen[current.id] = true;
       if (updated.scheduled_days === 0) queue.splice(Math.min(queue.length, index + 1 + RELEARN_GAP), 0, updated);
-      index += 1;
-      if (index >= queue.length) finish(); else show();
+      current._rated = rating;
+      paintRated(); updateCounts();
     }).catch(function (e) { N.toast('Could not save: ' + e.message, true); })
       .finally(function () { busy = false; });
   }
@@ -112,7 +135,7 @@
 
   // ---------------- More menu
   function setDueDate() {
-    if (!current) return;
+    if (!current || current._rated) return;
     var v = prompt('Show in how many days? (0 = today)', '1'); if (v === null) return;
     var d = parseInt(v, 10); if (isNaN(d) || d < 0) { N.toast('Enter a number of days', true); return; }
     $('more').removeAttribute('open');
@@ -120,6 +143,7 @@
     rate('custom', d);
   }
   $('m-due').addEventListener('click', setDueDate);
+  $('btn-custom').addEventListener('click', setDueDate);
   $('m-info').addEventListener('click', function () { if (current) location.href = '/quiz/cards/' + current.id; });
   $('m-deck').addEventListener('click', function () {
     if (!current) return;
@@ -144,7 +168,7 @@
 
   // ---------------- events
   $('btn-show').addEventListener('click', showAnswer);
-  document.querySelectorAll('.answer-buttons .abtn').forEach(function (b) {
+  document.querySelectorAll('.answer-buttons [data-rating]').forEach(function (b) {
     b.addEventListener('click', function () { rate(b.dataset.rating); });
   });
   document.addEventListener('keydown', function (e) {
@@ -156,7 +180,8 @@
     if (!revealed) { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); showAnswer(); } return; }
     var map = { '1': 'again', '2': 'hard', '3': 'good', '4': 'easy' };
     if (map[e.key]) { e.preventDefault(); rate(map[e.key]); }
-    else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); rate('good'); }
+    else if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') { e.preventDefault(); if (current && current._rated) next(); else if (e.key !== 'ArrowRight') rate('good'); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
   });
 
   load();

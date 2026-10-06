@@ -902,3 +902,38 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   .rv-bar .bar-center { display: flex; justify-content: center; margin-bottom: 14px; }
   .rv-bar .answer-buttons { width: 100%; }
 }
+
+/* ---------- reviewer: rating tiles ---------- */
+.rv-bar .answer-buttons { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: end; }
+.rv-bar .answer-buttons[hidden] { display: none; }
+.rv-bar .answer-buttons .ab { min-width: 0; }
+.rv-bar .answer-buttons .ivl { font-size: 13px; color: var(--fg-subtle); }
+.rv-bar .answer-buttons .abtn {
+  width: 100%; min-width: 0; flex-direction: column; gap: 6px; padding: 12px 6px;
+  font-size: 15px; font-weight: 600; border-radius: 12px; border: 2px solid transparent; box-shadow: none;
+}
+.rv-bar .answer-buttons .abtn i { width: 24px; height: 24px; stroke-width: 2.2; }
+.rv-bar .abtn.again  { background: #fecdd3; color: #e11d48; }
+.rv-bar .abtn.hard   { background: #fde68a; color: #d97706; }
+.rv-bar .abtn.good   { background: #bbf7d0; color: #15803d; }
+.rv-bar .abtn.easy   { background: #bfdbfe; color: #2563eb; }
+.rv-bar .abtn.custom { background: #ddd6fe; color: #7c3aed; }
+.rv-bar .answer-buttons .abtn:hover { filter: brightness(1.05); }
+.rv-bar .answer-buttons.locked .abtn { opacity: .35; cursor: default; filter: none; }
+.rv-bar .answer-buttons.locked .abtn.picked { opacity: 1; border-color: #fff; }
+.rv-bar #btn-next:not(:disabled) { background: #2f5bff; border-color: transparent; color: #fff; }
+
+@media (max-width: 768px) {
+  .rv-card-body { justify-content: flex-start; padding: 24px 12px; }
+  .rv-card #question { font-weight: 700; font-size: 26px; }
+  .rv-card #answer { font-size: 19px; line-height: 1.6; text-align: center; }
+  .rv-bar .bar-center { display: block; }
+  .rv-bar .answer-buttons { gap: 8px; }
+  .rv-bar .answer-buttons .abtn { padding: 12px 2px; font-size: 13px; }
+  .rv-bar .answer-buttons .abtn i { width: 22px; height: 22px; }
+  .rv-bar #btn-next:disabled { background: #141a26; color: var(--fg-subtle); }
+  .rv-bar #btn-next:not(:disabled) { flex-direction: row; gap: 10px; font-size: 16px; }
+}
+@media (max-width: 768px) { body.reviewer .anki-main.with-bottombar { padding-bottom: 300px; } .rv-card { min-height: 0; } }
+.rv-practice { display: flex; align-items: center; justify-content: center; gap: 8px; max-width: 1190px; margin: -8px auto 16px; font-size: 13px; color: #c4b5fd; }
+.rv-practice i { width: 16px; height: 16px; }
