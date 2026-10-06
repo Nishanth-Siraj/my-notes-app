@@ -519,7 +519,8 @@ def stats_page(request: Request, db: Session = Depends(get_db)):
         "total": db.query(Card).count(),
         "reviews_total": db.query(Review).count(),
     }
-    return render(request, "anki_stats.html", counts=counts, nav="quiz")
+    total_due = sum(d["due"] + d["learn"] for d in deck_counts(db))
+    return render(request, "anki_stats.html", counts=counts, total_due=total_due, nav="quiz")
 
 
 @router.get("/quiz/deck/{name}", response_class=HTMLResponse)

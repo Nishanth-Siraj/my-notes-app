@@ -45,7 +45,8 @@ window.AnkiHeatmap = (function () {
           var off = Math.round((d - today) / 86400000), n = fut ? fut.counts[off] || 0 : 0;
           cls += ' future l' + level(n, maxFut); title = n + ' due on ' + key;
         } else if (isToday) {
-          var c = hm.days[key] || 0, todayDue = fut ? fut.counts[0] || 0 : 0;
+          var c = hm.days[key] || 0;
+          var todayDue = parseInt(container.dataset.todayDue || '', 10) || (fut ? fut.counts[0] || 0 : 0);
           if (c > 0) {
             // reviewed some cards today — show orange; add blue glow if still cards due
             cls += ' l' + level(c, maxPast) + ' today';
