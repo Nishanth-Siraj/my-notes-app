@@ -3,9 +3,10 @@
 {% block nav_decks %}current{% endblock %}
 {% block bodyclass %}deckbrowser{% endblock %}
 
-{% block sidebar_stats %}
 {% set ns = namespace(due=0, new=0, learn=0) %}
 {% for d in decks %}{% set ns.due = ns.due + d.due %}{% set ns.new = ns.new + d.new %}{% set ns.learn = ns.learn + d.learn %}{% endfor %}
+
+{% block sidebar_stats %}
 <div class="sb-stats">
   <div class="sb-stat">
     <span class="sb-label">DUE</span>
