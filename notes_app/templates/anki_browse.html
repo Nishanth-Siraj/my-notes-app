@@ -4,44 +4,50 @@
 {% block bodyclass %}browser{% endblock %}
 
 {% block content %}
-<form class="browse-search" method="get" action="/quiz/browse">
-  <select name="deck" onchange="this.form.submit()">
-    <option value="">All decks</option>
-    {% for d in decks %}<option value="{{ d }}" {% if d == deck %}selected{% endif %}>{{ d }}</option>{% endfor %}
-  </select>
-  <input type="search" name="q" value="{{ q }}" placeholder="Search cards (type text, then press Enter)" autocomplete="off">
-  {% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
-  <label class="chk"><input type="checkbox" name="due" value="1" {% if due_only %}checked{% endif %} onchange="this.form.submit()"> is:due</label>
-  <button class="abtn" type="submit">Search</button>
+<form class=”br-search-bar” method=”get” action=”/quiz/browse”>
+  <div class=”br-deck-sel-wrap”>
+    <select name=”deck” class=”br-deck-sel” onchange=”this.form.submit()”>
+      <option value=””>All decks</option>
+      {% for d in decks %}<option value=”{{ d }}” {% if d == deck %}selected{% endif %}>{{ d }}</option>{% endfor %}
+    </select>
+    <i data-lucide=”chevron-down” class=”br-deck-chevron”></i>
+  </div>
+  <div class=”br-search-wrap”>
+    <i data-lucide=”search” class=”br-search-icon”></i>
+    <input type=”search” name=”q” value=”{{ q }}” class=”br-search-input” placeholder=”Search cards (type text, then press Enter)” autocomplete=”off”>
+    {% if tag %}<input type=”hidden” name=”tag” value=”{{ tag }}”>{% endif %}
+  </div>
+  <label class=”br-chk”><input type=”checkbox” name=”due” value=”1” {% if due_only %}checked{% endif %} onchange=”this.form.submit()”> is:due</label>
+  <button class=”abtn primary” type=”submit”>Search</button>
 </form>
 
-<p class="muted small">{{ cards|length }} card{{ '' if cards|length == 1 else 's' }}{% if deck %} in {{ deck }}{% endif %}{% if q %} matching “{{ q }}”{% endif %}{% if tag %} tagged {{ tag }}{% endif %}{% if due_only %} that are due{% endif %}</p>
+<p class=”br-count”>{{ cards|length }} card{{ '' if cards|length == 1 else 's' }}{% if deck %} in {{ deck }}{% endif %}{% if q %} matching “{{ q }}”{% endif %}{% if tag %} tagged {{ tag }}{% endif %}{% if due_only %} that are due{% endif %}</p>
 
 {% if cards %}
-<div class="table-wrap">
-<table class="browse">
+<div class=”panel br-table-panel”>
+<table class=”browse”>
   <thead>
     <tr><th>Sort Field</th><th>Deck</th><th>Due</th><th>Interval</th><th>Ease</th><th>Reviews</th><th>Lapses</th><th>Tags</th><th></th></tr>
   </thead>
   <tbody>
   {% for c in cards %}
-    <tr class="row {{ c.queue }}" data-href="/quiz/cards/{{ c.id }}/edit">
-      <td class="sf">{{ c.sort_field or '(empty)' }}</td>
-      <td>{{ c.deck }}</td>
-      <td class="{{ c.queue if c.due else '' }}">{{ c.due_display }}</td>
-      <td>{% if c.interval_days %}{{ c.interval_days }}d{% else %}(new){% endif %}</td>
-      <td>{{ (c.ease * 100)|round|int }}%</td>
-      <td>{{ c.reps }}</td>
-      <td>{{ c.lapses }}</td>
-      <td class="tags">{{ c.tags|join(' ') }}</td>
-      <td class="info"><a href="/quiz/cards/{{ c.id }}" title="Card Info">info</a> · <a href="#" data-move="{{ c.id }}" data-deck="{{ c.deck }}" title="Change Deck">deck</a></td>
+    <tr class=”row {{ c.queue }}” data-href=”/quiz/cards/{{ c.id }}/edit”>
+      <td class=”sf”>{{ c.sort_field or '(empty)' }}</td>
+      <td><span class=”br-deck-badge”>{{ c.deck }}</span></td>
+      <td><span class=”br-due-badge {{ 'br-due-now' if c.due else 'br-due-ok' }} {{ 'br-due-learn' if c.queue == 'learn' else '' }}”>{{ c.due_display }}</span></td>
+      <td class=”br-num”>{% if c.interval_days %}{{ c.interval_days }}d{% else %}(new){% endif %}</td>
+      <td class=”br-num”>{{ (c.ease * 100)|round|int }}%</td>
+      <td class=”br-num”>{{ c.reps }}</td>
+      <td class=”br-num”>{{ c.lapses }}</td>
+      <td class=”tags”>{% for t in c.tags %}<span class=”br-tag”>{{ t }}</span>{% endfor %}</td>
+      <td class=”info”><a href=”/quiz/cards/{{ c.id }}” class=”br-link”>info</a> · <a href=”#” class=”br-link” data-move=”{{ c.id }}” data-deck=”{{ c.deck }}”>deck</a></td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
 </div>
 {% else %}
-<p class="center muted">No cards match.</p>
+<p class=”center muted”>No cards match.</p>
 {% endif %}
 {% endblock %}
 

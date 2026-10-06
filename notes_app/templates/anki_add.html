@@ -28,8 +28,8 @@
 
 <!-- Front + Back side by side -->
 <div class="ac-fields">
-  {% for field, label, color, icon in [('question', 'Front', 'blue', 'layout-panel-left'), ('answer', 'Back', 'green', 'layout-panel-right')] %}
-  <div class="ac-card" data-field="{{ field }}">
+  {% for field, label, color, icon, grad in [('question', 'Front', 'blue', 'layout-panel-left', 'grad-blue'), ('answer', 'Back', 'green', 'layout-panel-right', 'grad-teal')] %}
+  <div class="ac-card {{ grad }}" data-field="{{ field }}">
     <div class="ac-card-hd">
       <span class="ac-field-icon {{ color }}"><i data-lucide="{{ icon }}"></i></span>
       <div>

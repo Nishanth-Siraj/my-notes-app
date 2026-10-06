@@ -4,23 +4,59 @@
 {% block bodyclass %}stats{% endblock %}
 
 {% block content %}
-<section class="heatmap-wrap" id="heatmap" data-days="365"></section>
+<div class="panel" style="margin-bottom:16px">
+  <div class="stats-section-hd">
+    <h2 class="stats-h2">Review heatmap</h2>
+    <p class="stats-sub">Each square represents the number of cards reviewed on a given day.</p>
+  </div>
+  <section class="heatmap-wrap" id="heatmap" data-days="365" style="margin-top:14px"></section>
+</div>
 
-<h2>Future Due</h2>
-<p class="muted small">Cards due over the next 30 days. Today includes anything overdue.</p>
-<div class="bars" id="future-bars"></div>
-<div class="bar-labels" id="future-labels"></div>
+<div class="panel" style="margin-bottom:16px">
+  <div class="stats-section-hd">
+    <h2 class="stats-h2">Future Due</h2>
+    <p class="stats-sub">Cards due over the next 30 days. Today includes anything overdue.</p>
+  </div>
+  <div class="future-chart-wrap">
+    <div class="future-y-axis" id="future-y"></div>
+    <div class="future-bars-wrap">
+      <div class="bars" id="future-bars"></div>
+      <div class="bar-labels" id="future-labels"></div>
+    </div>
+  </div>
+</div>
 
-<h2>Card Counts</h2>
-<div class="scroll-x">
-<table class="counts-table">
-  <tr><td class="new">New</td><td class="n">{{ counts.new }}</td></tr>
-  <tr><td class="learn">Learning</td><td class="n">{{ counts.learning }}</td></tr>
-  <tr><td class="review">Young (interval &lt; 21d)</td><td class="n">{{ counts.young }}</td></tr>
-  <tr><td class="review">Mature (interval &ge; 21d)</td><td class="n">{{ counts.mature }}</td></tr>
-  <tr><td>Total cards</td><td class="n">{{ counts.total }}</td></tr>
-  <tr><td>Total reviews</td><td class="n">{{ counts.reviews_total }}</td></tr>
-</table>
+<div class="panel">
+  <div class="stats-section-hd">
+    <h2 class="stats-h2">Card Counts</h2>
+    <p class="stats-sub">Overview of cards in your collection.</p>
+  </div>
+  <div class="ov-stats" style="margin-top:16px">
+    <div class="ov-stat-card">
+      <div class="ov-stat-icon blue"><i data-lucide="file-text"></i></div>
+      <div><div class="ov-stat-label">New</div><div class="ov-stat-val">{{ counts.new }}</div></div>
+    </div>
+    <div class="ov-stat-card">
+      <div class="ov-stat-icon purple"><i data-lucide="graduation-cap"></i></div>
+      <div><div class="ov-stat-label">Learning</div><div class="ov-stat-val">{{ counts.learning }}</div></div>
+    </div>
+    <div class="ov-stat-card">
+      <div class="ov-stat-icon red"><i data-lucide="clock"></i></div>
+      <div><div class="ov-stat-label">Young (interval &lt; 21d)</div><div class="ov-stat-val">{{ counts.young }}</div></div>
+    </div>
+    <div class="ov-stat-card" style="--stat-icon-bg:rgba(180,83,9,.3)">
+      <div class="ov-stat-icon" style="background:rgba(180,83,9,.3)"><i data-lucide="hourglass" style="color:#fb923c"></i></div>
+      <div><div class="ov-stat-label">Mature (interval &ge; 21d)</div><div class="ov-stat-val">{{ counts.mature }}</div></div>
+    </div>
+    <div class="ov-stat-card">
+      <div class="ov-stat-icon" style="background:rgba(79,70,229,.3)"><i data-lucide="layers" style="color:#818cf8"></i></div>
+      <div><div class="ov-stat-label">Total cards</div><div class="ov-stat-val">{{ counts.total }}</div></div>
+    </div>
+    <div class="ov-stat-card">
+      <div class="ov-stat-icon green"><i data-lucide="bar-chart-2"></i></div>
+      <div><div class="ov-stat-label">Total reviews</div><div class="ov-stat-val">{{ counts.reviews_total }}</div></div>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
