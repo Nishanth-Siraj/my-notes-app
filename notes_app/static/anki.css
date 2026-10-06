@@ -699,6 +699,8 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
 .br-tag { display: inline-flex; padding: 1px 7px; border-radius: 4px; font-size: 11px; background: var(--frame); color: var(--fg-subtle); margin: 1px 2px; }
 .br-link { font-size: 12px; color: var(--fg-subtle); }
 .br-link:hover { color: var(--fg); }
+.br-link-sep { font-size: 12px; color: var(--border); margin: 0 2px; }
+.br-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--fg-subtle); text-align: center; }
 
 /* add card gradient backgrounds */
 .ac-card.grad-blue { background: linear-gradient(135deg, rgba(29,78,216,.15) 0%, var(--canvas) 60%); }
