@@ -703,3 +703,55 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
 /* add card gradient backgrounds */
 .ac-card.grad-blue { background: linear-gradient(135deg, rgba(29,78,216,.15) 0%, var(--canvas) 60%); }
 .ac-card.grad-teal { background: linear-gradient(135deg, rgba(15,118,110,.15) 0%, var(--canvas) 60%); }
+
+/* ---------- mobile: new components ---------- */
+@media (max-width: 768px) {
+  /* panels */
+  .panel { padding: 14px 14px; border-radius: 10px; }
+
+  /* deck table with icons */
+  .deck-mini-icon { width: 28px; height: 28px; border-radius: 6px; }
+  .deck-mini-icon i { width: 14px; height: 14px; }
+  table.decks th, table.decks td { padding: 8px 8px; font-size: 13px; }
+  table.decks th.count, table.decks td.count { padding: 8px 4px; }
+
+  /* deck overview */
+  .ov-hero { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .ov-hero-actions { flex-wrap: wrap; gap: 8px; }
+  .ov-stats { grid-template-columns: repeat(2, 1fr); }
+  .ov-cards-hd { flex-direction: column; gap: 10px; }
+  .ov-cards-controls { width: 100%; }
+  .ov-search-wrap { width: 100%; }
+  .ov-search { width: 100%; }
+
+  /* stats page */
+  .stats-h2 { font-size: 1rem; }
+  .ov-stats { grid-template-columns: repeat(2, 1fr); }
+  .future-chart-wrap { flex-direction: row; }
+  .future-y-axis { height: 100px; min-width: 16px; font-size: 9px; }
+  .bars { height: 100px; }
+
+  /* browse page */
+  .br-search-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+  .br-deck-sel-wrap { width: 100%; }
+  .br-deck-sel { width: 100%; }
+  .br-search-wrap { min-width: 0; width: 100%; }
+  .br-chk { order: 3; }
+  .br-search-bar .abtn { order: 4; width: 100%; justify-content: center; }
+  /* hide less-important browse columns on mobile */
+  .br-table-panel table.browse th:nth-child(4),
+  .br-table-panel table.browse td:nth-child(4),
+  .br-table-panel table.browse th:nth-child(5),
+  .br-table-panel table.browse td:nth-child(5),
+  .br-table-panel table.browse th:nth-child(6),
+  .br-table-panel table.browse td:nth-child(6),
+  .br-table-panel table.browse th:nth-child(7),
+  .br-table-panel table.browse td:nth-child(7) { display: none; }
+
+  /* add card */
+  .ac-fields { grid-template-columns: 1fr; }
+  .ac-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .ac-actions { flex-wrap: wrap; gap: 8px; }
+  .ac-actions-right { flex-wrap: wrap; gap: 8px; width: 100%; }
+  .ac-actions-right .abtn { flex: 1; justify-content: center; }
+}
