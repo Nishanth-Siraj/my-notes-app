@@ -3,19 +3,48 @@
 {% block nav_decks %}current{% endblock %}
 {% block bodyclass %}deckbrowser{% endblock %}
 
+{% block sidebar_stats %}
+<div class="sb-stats">
+  <div class="sb-stat">
+    <span class="sb-label">DUE</span>
+    <span class="due">{% set total_due = namespace(v=0) %}{% for d in decks %}{% set total_due.v = total_due.v + d.due %}{% endfor %}{{ total_due.v }}</span>
+  </div>
+  <div class="sb-stat">
+    <span class="sb-label">NEW</span>
+    <span class="new">{% set total_new = namespace(v=0) %}{% for d in decks %}{% set total_new.v = total_new.v + d.new %}{% endfor %}{{ total_new.v }}</span>
+  </div>
+  <div class="sb-stat">
+    <span class="sb-label">LEARNING</span>
+    <span class="learn">{% set total_learn = namespace(v=0) %}{% for d in decks %}{% set total_learn.v = total_learn.v + d.learn %}{% endfor %}{{ total_learn.v }}</span>
+  </div>
+</div>
+{% endblock %}
+
+{% block sidebar_actions %}
+<button type="button" class="sb-item" id="btn-create-deck">
+  <i data-lucide="plus" class="sb-icon"></i><span>New deck</span>
+</button>
+{% endblock %}
+
 {% block content %}
 <div class="scroll-x">
 <table class="decks" id="decks">
   <thead>
-    <tr><th class="name">Deck</th><th class="count">New</th><th class="count">Learn</th><th class="count">Due</th><th class="gear"></th></tr>
+    <tr>
+      <th class="name">Deck</th>
+      <th class="count">Due</th>
+      <th class="count">New</th>
+      <th class="count">Total</th>
+      <th class="gear"></th>
+    </tr>
   </thead>
   <tbody>
   {% for d in decks %}
     <tr>
       <td class="name"><a class="deck" href="/quiz/deck/{{ d.name }}">{{ d.name }}</a></td>
-      <td class="count"><span class="new {{ 'zero' if d.new == 0 }}">{{ d.new }}</span></td>
-      <td class="count"><span class="learn {{ 'zero' if d.learn == 0 }}">{{ d.learn }}</span></td>
       <td class="count"><span class="review {{ 'zero' if d.due == 0 }}">{{ d.due }}</span></td>
+      <td class="count"><span class="new {{ 'zero' if d.new == 0 }}">{{ d.new }}</span></td>
+      <td class="count"><span class="total-ct {{ 'zero' if d.total == 0 }}">{{ d.total }}</span></td>
       <td class="gear">
         <details class="menu">
           <summary title="Options">&#9881;</summary>
@@ -34,12 +63,7 @@
 
 <p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% elif stats.due > 0 %}<span class="due-badge">{{ stats.due }} card{{ '' if stats.due == 1 else 's' }} due</span> — click a deck to start reviewing.{% else %}No cards are due today.{% endif %}</p>
 
-<div class="deck-buttons">
-  <button type="button" class="abtn" id="btn-create-deck">Create Deck</button>
-  <a class="abtn" href="/quiz/add">Add</a>
-</div>
-
-<!-- Review heatmap (like the Review Heatmap add-on on Anki's deck screen) -->
+<!-- Review heatmap -->
 <section class="heatmap-wrap" id="heatmap" data-days="365"></section>
 {% endblock %}
 
@@ -62,7 +86,6 @@
         .catch(function (e) { N.toast(e.message, true); });
     });
   });
-  // close any open gear menu when clicking elsewhere
   document.addEventListener('click', function (e) {
     document.querySelectorAll('details.menu[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
   });
