@@ -35,14 +35,23 @@
       if (c.reps === 0) n++; else if (c.learning) l++; else r++;
     }
     $('counts').innerHTML = '<span class="new">' + n + '</span> + <span class="learn">' + l + '</span> + <span class="review">' + r + '</span>';
+    var total = queue.length, pos = Math.min(index + 1, total);
+    $('progress').style.width = (total ? 100 * pos / total : 0) + '%';
+    $('progress-txt').textContent = pos + ' / ' + total;
+    $('btn-prev').disabled = index === 0;
+    $('btn-next').disabled = index >= total - 1;
   }
+
+  function isMarked() { return current && (current.tags || []).indexOf('marked') !== -1; }
+  function paintStar() { $('btn-star').classList.toggle('on', !!isMarked()); }
 
   function show() {
     current = queue[index]; revealed = false;
     N.renderMarkdown(qEl, current.question);
     N.renderMarkdown(aEl, current.answer || '_(empty)_');
     $('answer').hidden = true; $('answer-sep').hidden = true;
-    $('btn-show').hidden = false; $('answer-buttons').hidden = true;
+    $('btn-show').hidden = false; $('answer-buttons').hidden = true; $('hint').hidden = false;
+    paintStar();
     ['again', 'hard', 'good', 'easy'].forEach(function (r) { $('ivl-' + r).textContent = ivl(current.preview[r]); });
     $('btn-edit').href = '/quiz/cards/' + current.id + '/edit';
     $('card').hidden = false; $('done').hidden = true;
@@ -55,8 +64,26 @@
     if (revealed || !current) return;
     revealed = true;
     $('answer').hidden = false; $('answer-sep').hidden = false;
-    $('btn-show').hidden = true; $('answer-buttons').hidden = false;
+    $('btn-show').hidden = true; $('answer-buttons').hidden = false; $('hint').hidden = true;
   }
+
+  function go(delta) {
+    var i = index + delta;
+    if (i < 0 || i >= queue.length) return;
+    index = i; show();
+  }
+  $('btn-prev').addEventListener('click', function () { go(-1); });
+  $('btn-next').addEventListener('click', function () { go(1); });
+  $('btn-star').addEventListener('click', function () {
+    if (!current) return;
+    var tags = (current.tags || []).filter(function (t) { return t !== 'marked'; });
+    if (!isMarked()) tags.push('marked');
+    var c = current;
+    N.api('PUT', '/api/cards/' + c.id, { tags: tags }).then(function (u) {
+      c.tags = u.tags; if (c === current) paintStar();
+      N.toast(isMarked() ? 'Card marked' : 'Mark removed');
+    }).catch(function (e) { N.toast(e.message, true); });
+  });
 
   function rate(rating, days) {
     if (!revealed || busy || !current) return;
@@ -80,6 +107,7 @@
       ? ('Studied ' + total + ' card' + (total === 1 ? '' : 's') + ' · Again ' + counts.again + ' · Hard ' + counts.hard + ' · Good ' + counts.good + ' · Easy ' + counts.easy)
       : (cfg.forgotten ? 'No cards were rated Again recently.' : (cfg.all ? 'This deck has no cards.' : ''));
     updateCounts();
+    $('btn-prev').disabled = true; $('btn-next').disabled = true;
   }
 
   // ---------------- More menu

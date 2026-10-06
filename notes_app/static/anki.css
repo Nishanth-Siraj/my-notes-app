@@ -212,7 +212,7 @@ details.menu .menu-items .danger { color: var(--again); }
 .ov-hero-left { display: flex; align-items: center; gap: 16px; }
 .ov-deck-icon {
   width: 72px; height: 72px; border-radius: 16px;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: #4f46e5;
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .ov-deck-name { margin: 0; font-size: 2rem; font-weight: 700; color: var(--fg); }
@@ -706,8 +706,8 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
 .br-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--fg-subtle); text-align: center; }
 
 /* add card gradient backgrounds */
-.ac-card.grad-blue { background: linear-gradient(135deg, rgba(29,78,216,.15) 0%, var(--canvas) 60%); }
-.ac-card.grad-teal { background: linear-gradient(135deg, rgba(15,118,110,.15) 0%, var(--canvas) 60%); }
+.ac-card.grad-blue { background: var(--canvas); }
+.ac-card.grad-teal { background: var(--canvas); }
 
 /* ---------- mobile: new components ---------- */
 @media (max-width: 768px) {
@@ -757,4 +757,93 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
   .ac-actions { flex-wrap: wrap; gap: 8px; }
   .ac-actions-right { flex-wrap: wrap; gap: 8px; width: 100%; }
   .ac-actions-right .abtn { flex: 1; justify-content: center; }
+}
+
+/* ---------- reviewer (study) redesign ---------- */
+body.reviewer .anki-main { max-width: none; padding-top: 24px; }
+.rv-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; max-width: 1200px; margin: 0 auto 18px; }
+.rv-back { display: inline-flex; align-items: center; gap: 12px; color: var(--fg); font-size: 15px; min-width: 0; }
+.rv-back span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rv-back i { width: 20px; height: 20px; color: var(--fg-subtle); flex-shrink: 0; }
+.rv-back:hover { text-decoration: none; } .rv-back:hover i { color: var(--fg); }
+.rv-settings { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--canvas); color: var(--fg); font-size: 13px; }
+.rv-settings i { width: 16px; height: 16px; }
+.rv-settings:hover { background: var(--btn-bg-hover); text-decoration: none; }
+
+.rv-progress-row { display: flex; align-items: center; gap: 16px; max-width: 1190px; margin: 0 auto 22px; }
+.rv-progress { flex: 1; height: 10px; background: var(--frame); border-radius: 99px; overflow: hidden; }
+.rv-progress-fill { height: 100%; width: 0; background: #4f46e5; border-radius: 99px; transition: width .3s ease; }
+.rv-progress-txt { font-size: 14px; color: var(--fg-subtle); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.rv-card {
+  position: relative; max-width: 1190px; margin: 0 auto; min-height: 520px;
+  display: flex; flex-direction: column;
+  background: #151a33;
+  border: 1px solid rgba(99,102,241,.45); border-radius: 18px;
+}
+.rv-card[hidden] { display: none; }
+.rv-card-body { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 60px 48px; min-width: 0; }
+.rv-card .card-content { font-size: 34px; line-height: 1.4; color: #f1f2f8; }
+.rv-card #answer { font-size: 22px; color: var(--fg); }
+.rv-card hr#answer-sep { border-top-color: rgba(99,102,241,.35); width: 100%; }
+.rv-star { position: absolute; top: 22px; right: 26px; background: none; border: 0; color: #a5b4fc; cursor: pointer; padding: 6px; border-radius: 8px; }
+.rv-star i { width: 26px; height: 26px; stroke-width: 1.8; }
+.rv-star:hover { background: rgba(255,255,255,.06); }
+.rv-star.on { color: #facc15; } .rv-star.on i { fill: #facc15; }
+.rv-hint { display: flex; justify-content: flex-end; align-items: center; gap: 16px; padding: 0 32px 26px; font-size: 15px; color: var(--fg-subtle); }
+.rv-hint[hidden] { display: none; }
+.rv-kbd { font: inherit; font-size: 15px; color: var(--fg); margin: 0; padding: 7px 18px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,.03); }
+
+.rv-done { align-items: center; justify-content: center; text-align: center; padding: 48px 24px; gap: 6px; }
+.rv-done h2 { font-size: 1.4rem; margin: 6px 0; }
+.rv-done-icon { width: 48px; height: 48px; color: #a5b4fc; }
+.rv-done-btns { display: flex; gap: 10px; margin-top: 14px; }
+
+.rv-bar.bottombar {
+  left: calc(var(--sb-width) + 12px); right: 12px; bottom: 12px;
+  background: rgba(22,27,34,.92); backdrop-filter: blur(8px);
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 18px 24px; min-height: 0;
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px;
+}
+.rv-bar .bar-left, .rv-bar .bar-right { display: flex; align-items: center; gap: 22px; }
+.rv-bar .bar-right { gap: 20px; justify-content: flex-end; }
+.rv-btn { gap: 10px; padding: 12px 22px; font-size: 16px; border-radius: 8px; background: var(--canvas); box-shadow: none; }
+.rv-btn i { width: 20px; height: 20px; }
+.rv-btn:disabled { opacity: .4; cursor: default; }
+.rv-bar .counts { font-size: 17px; }
+.rv-bar .show-answer { gap: 12px; padding: 14px 44px; font-size: 17px; border-radius: 8px; background: #3b35e8; }
+.rv-bar .show-answer i { width: 22px; height: 22px; }
+.rv-bar details.menu > summary { color: var(--fg); padding: 12px 22px; font-size: 16px; }
+body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
+
+@media (max-width: 1100px) {
+  .rv-btn span, .rv-bar details.menu > summary span { display: none; }
+  .rv-btn, .rv-bar details.menu > summary { padding: 12px 14px; }
+}
+@media (max-width: 768px) {
+  body.reviewer .anki-main { padding-top: 12px; }
+  .rv-top { margin-bottom: 12px; }
+  .rv-settings span { display: none; }
+  .rv-progress-row { margin-bottom: 14px; gap: 10px; }
+  .rv-progress { height: 8px; }
+  .rv-card { min-height: 340px; border-radius: 14px; }
+  .rv-card-body { padding: 52px 18px 24px; }
+  .rv-card .card-content { font-size: 24px; }
+  .rv-card #answer { font-size: 18px; }
+  .rv-star { top: 12px; right: 12px; }
+  .rv-hint, .rv-hint[hidden] { display: none; }
+  .rv-kbd { font-size: 13px; padding: 4px 12px; }
+  .rv-bar.bottombar {
+    left: 8px; right: 8px; bottom: calc(64px + env(safe-area-inset-bottom));
+    display: flex; flex-direction: column; padding: 10px; gap: 10px;
+  }
+  .rv-bar .bar-left, .rv-bar .bar-right { justify-content: space-between; gap: 8px; width: 100%; }
+  .rv-bar .bar-left { order: 2; } .rv-bar .bar-center { order: 1; width: 100%; } .rv-bar .bar-right { order: 3; }
+  .rv-bar .show-answer { width: 100%; justify-content: center; padding: 13px; }
+  .rv-btn, .rv-bar details.menu > summary { padding: 9px 12px; flex: 1; justify-content: center; }
+  .rv-bar .bar-right > * { flex: 1; }
+  .rv-bar details.menu > summary { display: flex; }
+  .rv-bar .counts { font-size: 15px; }
+  body.reviewer .anki-main.with-bottombar { padding-bottom: 260px; }
 }
