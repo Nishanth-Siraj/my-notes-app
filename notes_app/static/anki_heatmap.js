@@ -44,9 +44,22 @@ window.AnkiHeatmap = (function () {
         else if (isFuture) {
           var off = Math.round((d - today) / 86400000), n = fut ? fut.counts[off] || 0 : 0;
           cls += ' future l' + level(n, maxFut); title = n + ' due on ' + key;
+        } else if (isToday) {
+          var c = hm.days[key] || 0, todayDue = fut ? fut.counts[0] || 0 : 0;
+          if (c > 0) {
+            // reviewed some cards today — show orange; add blue glow if still cards due
+            cls += ' l' + level(c, maxPast) + ' today';
+            title = c + ' review' + (c === 1 ? '' : 's') + ' today' + (todayDue > 0 ? ', ' + todayDue + ' still due' : '');
+          } else if (todayDue > 0) {
+            // not reviewed yet but cards are due — show blue
+            cls += ' future l' + level(todayDue, maxFut) + ' today';
+            title = todayDue + ' card' + (todayDue === 1 ? '' : 's') + ' due today';
+          } else {
+            cls += ' today'; title = '0 reviews today';
+          }
         } else {
           var c = hm.days[key] || 0;
-          cls += ' l' + level(c, maxPast) + (isToday ? ' today' : ''); title = c + ' review' + (c === 1 ? '' : 's') + ' on ' + key;
+          cls += ' l' + level(c, maxPast); title = c + ' review' + (c === 1 ? '' : 's') + ' on ' + key;
         }
         if (d < start) cells += '<div class="hm-cell" style="visibility:hidden"></div>';
         else cells += '<div class="' + cls + '" data-title="' + title + '"></div>';
