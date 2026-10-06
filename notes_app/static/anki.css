@@ -894,3 +894,11 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   .rv-bar .answer-buttons .abtn { padding: 14px 4px; border-radius: 12px; }
   body.reviewer .anki-main.with-bottombar { padding-bottom: 250px; }
 }
+@media (max-width: 768px) {
+  .rv-card { background: transparent; border: 0; box-shadow: none; }
+  .rv-star { display: none; }
+  .rv-show-go { display: none; }
+  .rv-bar .show-answer { width: 78%; justify-self: center; padding: 15px 20px; font-size: 18px; border-radius: 12px; }
+  .rv-bar .bar-center { display: flex; justify-content: center; margin-bottom: 14px; }
+  .rv-bar .answer-buttons { width: 100%; }
+}
