@@ -1,62 +1,98 @@
 {% extends "anki_base.html" %}
-{% block title %}{% if mode == 'add' %}Add{% else %}Edit{% endif %}{% endblock %}
+{% block title %}{% if mode == 'add' %}Add Card{% else %}Edit Card{% endif %}{% endblock %}
 {% block nav_add %}{% if mode == 'add' %}current{% endif %}{% endblock %}
 {% block bodyclass %}addcards{% endblock %}
-{% block mainclass %}with-bottombar{% endblock %}
 
 {% block content %}
-<div class="add-dialog">
-  <div class="type-deck">
-    <label>Type <span class="abtn static">Basic</span></label>
-    <label>Deck
-      <select id="deck">
-        {% for d in decks %}<option value="{{ d }}" {% if d == deck %}selected{% endif %}>{{ d }}</option>{% endfor %}
-        <option value="__new__">New deck…</option>
-      </select>
-    </label>
-  </div>
-
-  {% for field, label in [('question', 'Front'), ('answer', 'Back')] %}
-  <div class="field" data-field="{{ field }}">
-    <div class="field-label">
-      <span>{{ label }}</span>
-      <span class="fmt">
-        <button type="button" data-act="bold" title="Bold (Ctrl+B)"><b>B</b></button>
-        <button type="button" data-act="italic" title="Italic (Ctrl+I)"><i>I</i></button>
-        <button type="button" data-act="code" title="Inline code">&lt;/&gt;</button>
-        <button type="button" data-act="codeblock" title="Code block">{ }</button>
-        <select class="lang" title="Code block language">
-          <option value="">text</option><option value="python" selected>python</option><option value="bash">bash</option>
-          <option value="json">json</option><option value="yaml">yaml</option><option value="sql">sql</option>
-          <option value="javascript">javascript</option><option value="html">html</option>
-        </select>
-        <button type="button" data-act="math" title="Inline math $x$ (Ctrl+M)">&sum;</button>
-        <button type="button" data-act="mathblock" title="Display math $$ $$ (Ctrl+Shift+M)">$$</button>
-        <button type="button" data-act="image" title="Attach picture (paste or drop also works)">&#128444;</button>
-        <input type="file" accept="image/*" multiple hidden class="file">
-        <button type="button" data-act="preview" title="Preview">&#128065;</button>
-      </span>
+<!-- Page header -->
+<div class="ac-header">
+  <div class="ac-title-group">
+    <div class="ac-hero-icon">
+      <i data-lucide="{% if mode == 'add' %}plus-circle{% else %}edit-3{% endif %}"></i>
     </div>
-    <textarea id="{{ field }}" rows="5" spellcheck="false">{{ card[field] if card else '' }}</textarea>
+    <div>
+      <h1 class="ac-title">{% if mode == 'add' %}Add Card{% else %}Edit Card{% endif %}</h1>
+      <p class="ac-subtitle">{% if mode == 'add' %}Create a new flashcard for your deck{% else %}Update this flashcard{% endif %}</p>
+    </div>
+  </div>
+  <div class="ac-meta">
+    <span class="ac-meta-label">Type</span>
+    <span class="ac-meta-val">Basic</span>
+    <span class="ac-meta-label">Deck</span>
+    <select id="deck" class="ac-deck-sel">
+      {% for d in decks %}<option value="{{ d }}" {% if d == deck %}selected{% endif %}>{{ d }}</option>{% endfor %}
+      <option value="__new__">New deck…</option>
+    </select>
+  </div>
+</div>
+
+<!-- Front + Back side by side -->
+<div class="ac-fields">
+  {% for field, label, color, icon in [('question', 'Front', 'blue', 'layout-panel-left'), ('answer', 'Back', 'green', 'layout-panel-right')] %}
+  <div class="ac-card" data-field="{{ field }}">
+    <div class="ac-card-hd">
+      <span class="ac-field-icon {{ color }}"><i data-lucide="{{ icon }}"></i></span>
+      <div>
+        <div class="ac-field-name">{{ label }}</div>
+        <div class="ac-field-desc">What will you see on the {{ label|lower }} of the card?</div>
+      </div>
+    </div>
+    <div class="ac-toolbar">
+      <button type="button" class="ac-tbtn" data-act="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+      <button type="button" class="ac-tbtn" data-act="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+      <button type="button" class="ac-tbtn" data-act="code" title="Inline code">&lt;/&gt;</button>
+      <button type="button" class="ac-tbtn" data-act="codeblock" title="Code block">{ }</button>
+      <select class="ac-lang lang" title="Code language">
+        <option value="">text</option><option value="python" selected>python</option>
+        <option value="bash">bash</option><option value="json">json</option>
+        <option value="yaml">yaml</option><option value="sql">sql</option>
+        <option value="javascript">javascript</option><option value="html">html</option>
+      </select>
+      <button type="button" class="ac-tbtn" data-act="math" title="Inline math">&sum;</button>
+      <button type="button" class="ac-tbtn" data-act="link" title="Link">&nbsp;<i data-lucide="link" style="width:12px;height:12px;vertical-align:-1px"></i>&nbsp;</button>
+      <button type="button" class="ac-tbtn" data-act="image" title="Attach image"><i data-lucide="image" style="width:12px;height:12px;vertical-align:-1px"></i></button>
+      <input type="file" accept="image/*" multiple hidden class="file">
+      <button type="button" class="ac-tbtn" data-act="preview" title="Toggle preview"><i data-lucide="eye" style="width:12px;height:12px;vertical-align:-1px"></i></button>
+    </div>
+    <textarea id="{{ field }}" rows="7" spellcheck="false" placeholder="Enter the {{ label|lower }} side of your card...">{{ card[field] if card else '' }}</textarea>
     <div class="markdown-body preview" hidden></div>
   </div>
   {% endfor %}
+</div>
 
-  <div class="field tags-field">
-    <div class="field-label"><span>Tags</span></div>
-    <input type="text" id="tags" value="{{ card.tags|join(' ') if card else '' }}" placeholder="space or comma separated">
+<!-- Tags -->
+<div class="ac-card ac-tags-card">
+  <div class="ac-card-hd">
+    <span class="ac-field-icon purple"><i data-lucide="tag"></i></span>
+    <div>
+      <div class="ac-field-name">Tags</div>
+      <div class="ac-field-desc">Add tags to help organize your cards</div>
+    </div>
+  </div>
+  <input type="text" id="tag-input" class="ac-tag-input" placeholder="Type a tag and press Enter…" autocomplete="off">
+  <div class="ac-chips" id="tag-chips"></div>
+  <p class="ac-tags-hint">Separate multiple tags with commas or press Enter</p>
+  <input type="hidden" id="tags" value="{{ card.tags|join(',') if card else '' }}">
+</div>
+
+<!-- Actions -->
+<div class="ac-actions">
+  <button type="button" id="btn-clear" class="ac-btn-clear">
+    <i data-lucide="trash-2" style="width:15px;height:15px;vertical-align:-2px;margin-right:6px"></i>Clear
+  </button>
+  <div class="ac-actions-right">
+    {% if mode == 'edit' %}<a class="abtn" href="/quiz/cards/{{ card.id }}">Card Info</a>{% endif %}
+    <button type="button" id="btn-preview-all" class="abtn">
+      <i data-lucide="eye" class="btn-icon"></i>Preview
+    </button>
+    <button type="button" class="abtn primary" id="btn-save">
+      <i data-lucide="{% if mode == 'add' %}plus-circle{% else %}save{% endif %}" class="btn-icon"></i>{% if mode == 'add' %}Add Card{% else %}Save{% endif %}
+    </button>
   </div>
 </div>
 
+<a href="{% if mode == 'add' %}/quiz{% else %}/quiz/cards/{{ card.id }}{% endif %}" id="btn-close" hidden></a>
 <script id="card-data" type="application/json">{{ (card or {})|tojson }}</script>
-{% endblock %}
-
-{% block bottombar %}
-<div class="bottombar">
-  <button type="button" class="abtn primary" id="btn-save">{% if mode == 'add' %}Add{% else %}Save{% endif %} <kbd>Ctrl+Enter</kbd></button>
-  {% if mode == 'edit' %}<a class="abtn" href="/quiz/cards/{{ card.id }}">Card Info</a>{% endif %}
-  <a class="abtn" href="{% if mode == 'add' %}/quiz{% else %}/quiz/cards/{{ card.id }}{% endif %}" id="btn-close">Close</a>
-</div>
 {% endblock %}
 
 {% block scripts %}

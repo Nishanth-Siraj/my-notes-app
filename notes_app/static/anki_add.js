@@ -1,4 +1,4 @@
-/* Anki "Add" dialog: Type/Deck, Front, Back, Tags. Stays open after adding, keeps deck + tags. */
+/* Anki "Add/Edit" card dialog */
 (function () {
   'use strict';
   var N = window.Notes;
@@ -7,7 +7,7 @@
   var cardId = card.id || null;
   var deckSel = $('deck');
 
-  // "New deck…" option prompts for a name and adds it to the select
+  // "New deck…" option
   var lastDeck = deckSel.value;
   deckSel.addEventListener('change', function () {
     if (deckSel.value !== '__new__') { lastDeck = deckSel.value; return; }
@@ -48,9 +48,10 @@
     });
   }
 
-  document.querySelectorAll('.field[data-field]').forEach(function (sec) {
+  document.querySelectorAll('.ac-card[data-field]').forEach(function (sec) {
     var ta = sec.querySelector('textarea'), prev = sec.querySelector('.preview');
-    var lang = sec.querySelector('.lang'), file = sec.querySelector('.file'), pbtn = sec.querySelector('[data-act="preview"]');
+    var lang = sec.querySelector('.lang'), file = sec.querySelector('.file');
+    var pbtn = sec.querySelector('[data-act="preview"]');
     N.bindMarkdownContainer(prev);
     function render() { if (!prev.hidden) N.renderMarkdown(prev, ta.value || '_(empty)_'); }
     ta.addEventListener('input', render);
@@ -59,15 +60,16 @@
     sec.querySelector('[data-act="code"]').addEventListener('click', function () { wrap(ta, '`', '`', 'code'); });
     sec.querySelector('[data-act="codeblock"]').addEventListener('click', function () {
       var sel = ta.value.substring(ta.selectionStart, ta.selectionEnd);
-      block(ta, '```' + lang.value + '\n' + (sel || '# code') + '\n```');
+      block(ta, '```' + (lang ? lang.value : '') + '\n' + (sel || '# code') + '\n```');
     });
     sec.querySelector('[data-act="math"]').addEventListener('click', function () { wrap(ta, '$', '$', 'x^2'); });
-    sec.querySelector('[data-act="mathblock"]').addEventListener('click', function () {
-      var sel = ta.value.substring(ta.selectionStart, ta.selectionEnd); block(ta, '$$\n' + (sel || 'E = mc^2') + '\n$$');
-    });
+    var lnkBtn = sec.querySelector('[data-act="link"]');
+    if (lnkBtn) lnkBtn.addEventListener('click', function () { wrap(ta, '[', '](url)', 'link text'); });
     sec.querySelector('[data-act="image"]').addEventListener('click', function () { file.click(); });
     file.addEventListener('change', function () { upload(ta, file.files); file.value = ''; });
-    pbtn.addEventListener('click', function () { prev.hidden = !prev.hidden; pbtn.classList.toggle('active', !prev.hidden); render(); });
+    pbtn.addEventListener('click', function () {
+      prev.hidden = !prev.hidden; pbtn.classList.toggle('active', !prev.hidden); render();
+    });
     ta.addEventListener('paste', function (e) {
       var items = e.clipboardData && e.clipboardData.items; if (!items) return;
       var files = [];
@@ -81,8 +83,65 @@
       if (e.key === 'Tab') { e.preventDefault(); ta.setRangeText('    ', ta.selectionStart, ta.selectionEnd, 'end'); }
       if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); wrap(ta, '**', '**', 'bold'); }
       if ((e.ctrlKey || e.metaKey) && e.key === 'i') { e.preventDefault(); wrap(ta, '_', '_', 'italic'); }
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'm' || e.key === 'M')) { e.preventDefault(); if (e.shiftKey) block(ta, '$$\n' + 'E = mc^2' + '\n$$'); else wrap(ta, '$', '$', 'x^2'); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'm') { e.preventDefault(); if (e.shiftKey) block(ta, '$$\nE = mc^2\n$$'); else wrap(ta, '$', '$', 'x^2'); }
     });
+  });
+
+  // ---------------- tag chips
+  var tagsInput = $('tags');           // hidden, comma-joined
+  var tagInput = $('tag-input');       // visible text input
+  var chipsEl = $('tag-chips');
+  var tags = tagsInput.value ? tagsInput.value.split(',').map(function (t) { return t.trim(); }).filter(Boolean) : [];
+
+  function syncTags() {
+    tagsInput.value = tags.join(',');
+    chipsEl.innerHTML = '';
+    tags.forEach(function (t, i) {
+      var chip = document.createElement('span'); chip.className = 'ac-chip';
+      chip.innerHTML = t + '<button type="button" aria-label="Remove" data-i="' + i + '">&times;</button>';
+      chipsEl.appendChild(chip);
+    });
+    if (window.lucide) lucide.createIcons({ nodes: [chipsEl] });
+  }
+  chipsEl.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-i]');
+    if (!btn) return;
+    tags.splice(parseInt(btn.dataset.i, 10), 1);
+    syncTags();
+  });
+  function addTag(raw) {
+    raw.split(/[,\s]+/).forEach(function (t) {
+      t = t.trim().toLowerCase();
+      if (t && !tags.includes(t)) tags.push(t);
+    });
+    syncTags();
+  }
+  tagInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      if (tagInput.value.trim()) { addTag(tagInput.value); tagInput.value = ''; }
+    } else if (e.key === 'Backspace' && !tagInput.value && tags.length) {
+      tags.pop(); syncTags();
+    }
+  });
+  tagInput.addEventListener('blur', function () {
+    if (tagInput.value.trim()) { addTag(tagInput.value); tagInput.value = ''; }
+  });
+  syncTags();
+
+  // tag autocomplete on the visible input
+  N.tagAutocomplete(tagInput, '/api/quiz/tags', ',');
+
+  // ---------------- clear button
+  $('btn-clear').addEventListener('click', function () {
+    $('question').value = ''; $('answer').value = '';
+    tags = []; syncTags();
+    $('question').focus();
+  });
+
+  // ---------------- preview all
+  $('btn-preview-all') && $('btn-preview-all').addEventListener('click', function () {
+    document.querySelectorAll('.ac-card[data-field] [data-act="preview"]').forEach(function (b) { b.click(); });
   });
 
   // ---------------- save
@@ -90,18 +149,17 @@
   function save() {
     if (saving) return;
     var question = $('question').value.trim();
-    if (!question) { N.toast('The first field is empty.', true); $('question').focus(); return; }
+    if (!question) { N.toast('The front field is empty.', true); $('question').focus(); return; }
+    if (tagInput.value.trim()) { addTag(tagInput.value); tagInput.value = ''; }
     saving = true;
-    var body = { question: question, answer: $('answer').value, tags: $('tags').value.replace(/\s+/g, ','), deck: deckSel.value };
+    var body = { question: question, answer: $('answer').value, tags: tagsInput.value, deck: deckSel.value };
     var req = cardId ? N.api('PUT', '/api/cards/' + cardId, body) : N.api('POST', '/api/cards', body);
     req.then(function (c) {
       if (cardId) { location.href = '/quiz/cards/' + c.id; return; }
-      // Anki keeps the Add dialog open: clear fields, keep deck and tags
       $('question').value = ''; $('answer').value = '';
-      document.querySelectorAll('.field .preview').forEach(function (p) { if (!p.hidden) N.renderMarkdown(p, '_(empty)_'); });
       $('question').focus();
-      N.toast('Added.');
-    }).catch(function (e) { N.toast('Could not add: ' + e.message, true); })
+      N.toast('Card added!');
+    }).catch(function (e) { N.toast('Could not save: ' + e.message, true); })
       .finally(function () { saving = false; });
   }
   $('btn-save').addEventListener('click', save);
@@ -110,7 +168,4 @@
     if (e.key === 'Escape') location.href = $('btn-close').href;
   });
   if (!cardId) $('question').focus();
-
-  // tag autocomplete
-  N.tagAutocomplete($('tags'), '/api/quiz/tags', ',');
 })();

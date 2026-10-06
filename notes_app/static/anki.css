@@ -243,7 +243,127 @@ hr#answer-sep, .qa.boxed hr { border: 0; border-top: 1px solid var(--border); ma
 .abtn.good { background: var(--good); } .abtn.easy { background: var(--easy); }
 .answer-buttons .abtn:hover { filter: brightness(1.12); }
 
-/* ---------- add / edit ---------- */
+/* ---------- add / edit card ---------- */
+
+/* page header */
+.ac-header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 14px; margin-bottom: 24px;
+}
+.ac-title-group { display: flex; align-items: center; gap: 14px; }
+.ac-hero-icon {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--btn-primary); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.ac-hero-icon i { width: 22px; height: 22px; color: #fff; stroke-width: 2; }
+.ac-title { margin: 0; font-size: 1.5rem; font-weight: 700; color: var(--fg); }
+.ac-subtitle { margin: 2px 0 0; font-size: 13px; color: var(--fg-subtle); }
+.ac-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ac-meta-label { font-size: 13px; color: var(--fg-subtle); }
+.ac-meta-val {
+  font-size: 13px; color: var(--fg); background: var(--frame);
+  border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px;
+}
+.ac-deck-sel {
+  font: inherit; font-size: 13px; color: var(--fg); background: var(--frame);
+  border: 1px solid var(--border); border-radius: 6px; padding: 5px 30px 5px 12px;
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237d8590' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+}
+.ac-deck-sel:focus { outline: 2px solid var(--btn-primary); outline-offset: -1px; }
+
+/* two-column fields */
+.ac-fields {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;
+}
+
+/* card container */
+.ac-card {
+  background: var(--canvas); border: 1px solid var(--border); border-radius: 12px;
+  overflow: hidden;
+}
+.ac-tags-card { margin-bottom: 16px; }
+.ac-card-hd {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 16px 16px 12px;
+}
+.ac-field-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ac-field-icon i { width: 18px; height: 18px; color: #fff; stroke-width: 2; }
+.ac-field-icon.blue   { background: #1d4ed8; }
+.ac-field-icon.green  { background: #15803d; }
+.ac-field-icon.purple { background: #7c3aed; }
+.ac-field-name { font-weight: 700; font-size: 15px; color: var(--fg); }
+.ac-field-desc { font-size: 12px; color: var(--fg-subtle); margin-top: 1px; }
+
+/* formatting toolbar */
+.ac-toolbar {
+  display: flex; align-items: center; gap: 2px; flex-wrap: wrap;
+  padding: 0 16px 10px; border-bottom: 1px solid var(--border);
+}
+.ac-tbtn {
+  background: none; border: 1px solid transparent; border-radius: 5px;
+  color: var(--fg-subtle); font: inherit; font-size: 12px;
+  padding: 3px 7px; cursor: pointer; display: inline-flex; align-items: center;
+  transition: background .1s, color .1s;
+}
+.ac-tbtn:hover { background: var(--frame); color: var(--fg); border-color: var(--border); }
+.ac-tbtn.active { background: var(--btn-primary); color: #fff; border-color: transparent; }
+.ac-lang {
+  font: inherit; font-size: 12px; color: var(--fg-subtle); background: none;
+  border: 1px solid var(--border); border-radius: 5px; padding: 3px 6px; cursor: pointer;
+}
+.ac-lang:focus { outline: 1px solid var(--btn-primary); }
+
+/* textarea */
+.ac-card textarea {
+  display: block; width: 100%; min-height: 160px; resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px;
+  line-height: 1.6; color: var(--fg); background: transparent;
+  border: 0; padding: 14px 16px; outline: none;
+}
+.ac-card textarea::placeholder { color: var(--fg-subtle); opacity: .7; }
+.ac-card.dragover textarea { outline: 2px dashed var(--btn-primary) inset; }
+.ac-card .preview { padding: 12px 16px; border-top: 1px dashed var(--border); }
+
+/* tags section */
+.ac-tag-input {
+  display: block; width: 100%; font: inherit; font-size: 14px;
+  color: var(--fg); background: transparent; border: 0; border-bottom: 1px solid var(--border);
+  padding: 12px 16px; outline: none;
+}
+.ac-tag-input::placeholder { color: var(--fg-subtle); opacity: .7; }
+.ac-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 16px 4px; min-height: 16px; }
+.ac-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--frame); border: 1px solid var(--border); border-radius: 20px;
+  color: var(--fg); font-size: 13px; padding: 3px 10px 3px 12px;
+}
+.ac-chip button {
+  background: none; border: 0; color: var(--fg-subtle); cursor: pointer; font-size: 14px;
+  line-height: 1; padding: 0 2px; display: flex; align-items: center;
+}
+.ac-chip button:hover { color: var(--fg); }
+.ac-tags-hint { padding: 4px 16px 14px; font-size: 12px; color: var(--fg-subtle); margin: 0; }
+
+/* bottom action bar */
+.ac-actions {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 0 4px; flex-wrap: wrap; gap: 10px;
+}
+.ac-actions-right { display: flex; align-items: center; gap: 10px; }
+.ac-btn-clear {
+  background: var(--frame); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--fg-subtle); font: inherit; font-size: 14px;
+  padding: 8px 18px; cursor: pointer; display: inline-flex; align-items: center;
+}
+.ac-btn-clear:hover { color: var(--fg); background: var(--btn-bg-hover); }
+
+/* legacy field styles (used on other pages via .field) */
 .add-dialog { max-width: 760px; }
 .type-deck { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 14px; font-size: 14px; }
 .type-deck label { display: flex; align-items: center; gap: 8px; }
@@ -263,6 +383,11 @@ hr#answer-sep, .qa.boxed hr { border: 0; border-top: 1px solid var(--border); ma
 .field textarea:focus, .field input:focus, .type-deck select:focus { outline: 2px solid var(--btn-primary); outline-offset: -1px; }
 .field .preview { margin-top: 8px; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 5px; background: var(--window); }
 .field.dragover textarea { outline: 2px dashed var(--btn-primary); }
+
+@media (max-width: 768px) {
+  .ac-fields { grid-template-columns: 1fr; }
+  .ac-header { flex-direction: column; align-items: flex-start; }
+}
 
 /* ---------- browser ---------- */
 .browse-search { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
