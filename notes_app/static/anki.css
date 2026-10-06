@@ -239,8 +239,10 @@ details.menu .menu-items .danger { color: var(--again); }
 }
 .ov-stat-card {
   background: var(--canvas); border: 1px solid var(--border); border-radius: 12px;
-  padding: 18px 18px; display: flex; align-items: center; gap: 14px;
+  padding: 18px; display: flex; align-items: center; gap: 14px;
+  min-width: 0; overflow: hidden;
 }
+.ov-stat-card > div:last-child { min-width: 0; overflow: hidden; }
 .ov-stat-icon {
   width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
@@ -254,7 +256,7 @@ details.menu .menu-items .danger { color: var(--again); }
 .ov-stat-icon.purple i { color: #a78bfa; }
 .ov-stat-icon.red    { background: rgba(220,38,38,.3); }
 .ov-stat-icon.red i  { color: #f87171; }
-.ov-stat-label { font-size: 12px; color: var(--fg-subtle); font-weight: 500; text-transform: uppercase; letter-spacing: .05em; }
+.ov-stat-label { font-size: 11px; color: var(--fg-subtle); font-weight: 500; text-transform: uppercase; letter-spacing: .04em; white-space: normal; word-break: break-word; line-height: 1.3; }
 .ov-stat-val { font-size: 1.8rem; font-weight: 700; color: var(--fg); line-height: 1.1; margin-top: 2px; }
 
 /* cards section */
@@ -718,10 +720,14 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
   table.decks th, table.decks td { padding: 8px 8px; font-size: 13px; }
   table.decks th.count, table.decks td.count { padding: 8px 4px; }
 
-  /* deck overview */
+  /* deck overview + stat cards */
   .ov-hero { flex-direction: column; align-items: flex-start; gap: 12px; }
   .ov-hero-actions { flex-wrap: wrap; gap: 8px; }
   .ov-stats { grid-template-columns: repeat(2, 1fr); }
+  .ov-stat-card { padding: 12px; gap: 10px; }
+  .ov-stat-icon { width: 36px; height: 36px; border-radius: 8px; }
+  .ov-stat-icon i { width: 18px; height: 18px; }
+  .ov-stat-val { font-size: 1.4rem; }
   .ov-cards-hd { flex-direction: column; gap: 10px; }
   .ov-cards-controls { width: 100%; }
   .ov-search-wrap { width: 100%; }
