@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.11/katex.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', path='anki.css') }}?v=9">
+  <link rel="stylesheet" href="{{ url_for('static', path='anki.css') }}?v=10">
 </head>
 <body class="anki {% block bodyclass %}{% endblock %}">
 
@@ -117,6 +117,16 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 {% block scripts %}{% endblock %}
 <script>if(window.lucide)lucide.createIcons();</script>
-<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/static/sw.js');</script>
+<script>
+// Force-clear ALL caches on every load so stale CSS/JS never persists
+if ('caches' in window) { caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); }); }
+if ('serviceWorker' in navigator) {
+  // Unregister old service workers, then re-register fresh
+  navigator.serviceWorker.getRegistrations().then(function(regs){
+    regs.forEach(function(r){ r.unregister(); });
+    navigator.serviceWorker.register('/static/sw.js');
+  });
+}
+</script>
 </body>
 </html>
