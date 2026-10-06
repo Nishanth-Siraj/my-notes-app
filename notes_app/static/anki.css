@@ -1042,3 +1042,4 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
 }
 @media (max-width: 768px) { .rv-bar .rv-btn { font-size: 15px; } .rv-bar #btn-next:not(:disabled) { font-size: 17px; } }
 @media (max-width: 768px) { .rv-bar .rv-btn svg { flex-shrink: 0; width: 22px; height: 22px; } .rv-bar .rv-btn { padding: 15px 4px; gap: 6px; } .rv-bar .counts { font-size: 17px; } }
+.panel.panel-menus { overflow: visible; }
