@@ -197,20 +197,106 @@ details.menu .menu-items a, details.menu .menu-items button {
 details.menu .menu-items a:hover, details.menu .menu-items button:hover { background: var(--frame); text-decoration: none; }
 details.menu .menu-items .danger { color: var(--again); }
 
-/* ---------- overview ---------- */
-.deck-title { font-size: 1.5rem; font-weight: 500; margin: 0 0 20px; color: var(--fg); }
-table.overview-counts { margin: 0 0 18px; border-collapse: collapse; font-size: 16px; }
-table.overview-counts td { padding: 4px 14px; }
-table.overview-counts td.count { text-align: right; font-variant-numeric: tabular-nums; }
-.study-buttons { display: flex; gap: 10px; margin: 14px 0; }
-.study-buttons .abtn.primary { padding: 9px 30px; font-size: 15px; }
-.congrats { max-width: 560px; }
-.congrats h2 { font-weight: 400; font-size: 1.25rem; color: var(--fg); }
-.custom-study { margin-top: 10px; }
-.custom-study details > summary { list-style: none; display: inline-flex; }
-.custom-study details > summary::-webkit-details-marker { display: none; }
-.custom-items { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; margin-top: 10px; }
-.description { color: var(--fg-subtle); margin-top: 26px; font-size: 13px; }
+/* ---------- overview (deck detail) ---------- */
+.ov-back {
+  display: inline-flex; align-items: center; color: var(--fg-subtle);
+  font-size: 13px; text-decoration: none; margin-bottom: 20px;
+}
+.ov-back:hover { color: var(--fg); text-decoration: none; }
+
+/* hero */
+.ov-hero {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 20px; flex-wrap: wrap; margin-bottom: 24px;
+}
+.ov-hero-left { display: flex; align-items: center; gap: 16px; }
+.ov-deck-icon {
+  width: 72px; height: 72px; border-radius: 16px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.ov-deck-name { margin: 0; font-size: 2rem; font-weight: 700; color: var(--fg); }
+.ov-deck-sub { margin: 4px 0 0; font-size: 13px; color: var(--fg-subtle); }
+.ov-hero-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.ov-study-btn { padding: 10px 24px; font-size: 15px; font-weight: 600; border-radius: 8px; }
+.ov-custom-wrap { position: relative; }
+.ov-custom-wrap > summary { list-style: none; }
+.ov-custom-wrap > summary::-webkit-details-marker { display: none; }
+.ov-custom-btn { padding: 10px 20px; font-size: 14px; border-radius: 8px; }
+.ov-custom-items {
+  position: absolute; right: 0; top: calc(100% + 6px); z-index: 200; min-width: 220px;
+  background: var(--window); border: 1px solid var(--border); border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); display: flex; flex-direction: column; padding: 4px 0;
+}
+.ov-custom-items a {
+  padding: 10px 16px; font-size: 14px; color: var(--fg); display: block;
+}
+.ov-custom-items a:hover { background: var(--frame); text-decoration: none; }
+
+/* stat cards row */
+.ov-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px;
+}
+.ov-stat-card {
+  background: var(--canvas); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px 18px; display: flex; align-items: center; gap: 14px;
+}
+.ov-stat-icon {
+  width: 44px; height: 44px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.ov-stat-icon i { width: 22px; height: 22px; color: #fff; stroke-width: 2; }
+.ov-stat-icon.blue   { background: rgba(79,70,229,.3); }
+.ov-stat-icon.blue i { color: #818cf8; }
+.ov-stat-icon.green  { background: rgba(21,128,61,.3); }
+.ov-stat-icon.green i{ color: #4ade80; }
+.ov-stat-icon.purple { background: rgba(124,58,237,.3); }
+.ov-stat-icon.purple i { color: #a78bfa; }
+.ov-stat-icon.red    { background: rgba(220,38,38,.3); }
+.ov-stat-icon.red i  { color: #f87171; }
+.ov-stat-label { font-size: 12px; color: var(--fg-subtle); font-weight: 500; text-transform: uppercase; letter-spacing: .05em; }
+.ov-stat-val { font-size: 1.8rem; font-weight: 700; color: var(--fg); line-height: 1.1; margin-top: 2px; }
+
+/* cards section */
+.ov-cards-section {
+  background: var(--canvas); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+}
+.ov-cards-hd {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 18px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px;
+}
+.ov-cards-title-group { display: flex; align-items: center; gap: 12px; }
+.ov-cards-title { font-size: 16px; font-weight: 700; color: var(--fg); }
+.ov-cards-sub { font-size: 12px; color: var(--fg-subtle); margin-top: 1px; }
+.ov-cards-controls { display: flex; gap: 10px; align-items: center; }
+.ov-search-wrap { position: relative; display: flex; align-items: center; }
+.ov-search-icon { position: absolute; left: 10px; width: 14px; height: 14px; color: var(--fg-subtle); stroke-width: 2; }
+.ov-search { background: var(--window); border: 1px solid var(--border); border-radius: 8px; color: var(--fg); font: inherit; font-size: 13px; padding: 7px 12px 7px 32px; width: 220px; outline: none; }
+.ov-search:focus { border-color: var(--btn-primary); }
+
+/* card rows */
+.ov-card-row {
+  display: flex; align-items: center; gap: 14px; padding: 13px 20px;
+  border-bottom: 1px solid rgba(48,54,61,.5); transition: background .1s;
+}
+.ov-card-row:last-child { border-bottom: 0; }
+.ov-card-row:hover { background: rgba(255,255,255,.03); }
+.ov-card-num { font-size: 12px; color: var(--fg-subtle); min-width: 22px; text-align: right; }
+.ov-card-q { flex: 1; font-size: 14px; color: var(--fg); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.ov-card-q:hover { color: #fff; }
+.ov-card-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+.badge-due    { background: rgba(220,38,38,.2); color: #f87171; }
+.badge-new    { background: rgba(79,70,229,.2); color: #818cf8; }
+.badge-ok     { background: rgba(21,128,61,.2); color: #4ade80; }
+.ov-card-menu { flex-shrink: 0; }
+.ov-card-menu details.menu > summary { font-size: 18px; letter-spacing: 1px; color: var(--fg-subtle); }
+.ov-card-menu details.menu > summary:hover { color: var(--fg); }
+
+@media (max-width: 768px) {
+  .ov-stats { grid-template-columns: repeat(2, 1fr); }
+  .ov-hero { flex-direction: column; }
+  .ov-search { width: 160px; }
+}
 
 /* ---------- bottom bar (overview / review) ---------- */
 .bottombar {

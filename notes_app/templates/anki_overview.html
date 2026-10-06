@@ -4,52 +4,151 @@
 {% block bodyclass %}overview{% endblock %}
 
 {% block content %}
-<h1 class="deck-title">{{ deck.name }}</h1>
+<!-- Back link -->
+<a class="ov-back" href="/quiz">
+  <i data-lucide="arrow-left" style="width:15px;height:15px;vertical-align:-2px;margin-right:4px"></i>All Decks
+</a>
 
-{% set total_due = deck.new + deck.learn + deck.due %}
-{% if total_due %}
-<table class="overview-counts">
-  <tr><td>New:</td><td class="count"><span class="new">{{ deck.new }}</span></td></tr>
-  <tr><td>Learning:</td><td class="count"><span class="learn">{{ deck.learn }}</span></td></tr>
-  <tr><td>To Review:</td><td class="count"><span class="review">{{ deck.due }}</span></td></tr>
-</table>
-<div class="study-buttons">
-  <a class="abtn primary" href="/quiz/review?deck={{ deck.name }}" id="study-now">Study Now</a>
-</div>
-{% else %}
-<div class="congrats">
-  <h2>Congratulations! You have finished this deck for now.</h2>
-  <p>{% if deck.total %}There are no cards due today. Come back tomorrow, or study ahead.{% else %}This deck has no cards yet.{% endif %}</p>
-</div>
-{% endif %}
-
-<div class="custom-study">
-  <details>
-    <summary class="abtn">Custom Study</summary>
-    <div class="custom-items">
-      <a class="abtn" href="/quiz/review?deck={{ deck.name }}&all=1">Review ahead (all {{ deck.total }} cards)</a>
-      <a class="abtn" href="/quiz/review?deck={{ deck.name }}&forgotten=1">Relearn forgotten cards</a>
+<!-- Hero -->
+<div class="ov-hero">
+  <div class="ov-hero-left">
+    <div class="ov-deck-icon">
+      <i data-lucide="layers" style="width:32px;height:32px;color:#fff"></i>
     </div>
-  </details>
+    <div>
+      <h1 class="ov-deck-name">{{ deck.name }}</h1>
+      <p class="ov-deck-sub">{{ deck.total }} card{{ '' if deck.total == 1 else 's' }} in this deck</p>
+    </div>
+  </div>
+  <div class="ov-hero-actions">
+    <details class="ov-custom-wrap">
+      <summary class="abtn ov-custom-btn">
+        <i data-lucide="pencil" class="btn-icon"></i>Custom Study
+      </summary>
+      <div class="ov-custom-items">
+        <a href="/quiz/review?deck={{ deck.name }}&all=1">Review all {{ deck.total }} cards</a>
+        <a href="/quiz/review?deck={{ deck.name }}&forgotten=1">Relearn forgotten cards</a>
+      </div>
+    </details>
+    {% set total_due = deck.new + deck.learn + deck.due %}
+    {% if total_due %}
+    <a class="abtn primary ov-study-btn" href="/quiz/review?deck={{ deck.name }}" id="study-now">
+      <i data-lucide="play" class="btn-icon"></i>Study Now
+    </a>
+    {% else %}
+    <span class="abtn ov-study-btn" style="opacity:.5;cursor:default">
+      <i data-lucide="check-circle" class="btn-icon"></i>All done
+    </span>
+    {% endif %}
+  </div>
 </div>
 
-<p class="description">{{ deck.total }} card{{ '' if deck.total == 1 else 's' }} in this deck.</p>
-{% endblock %}
+<!-- Stat cards -->
+<div class="ov-stats">
+  <div class="ov-stat-card">
+    <div class="ov-stat-icon blue"><i data-lucide="file-text"></i></div>
+    <div>
+      <div class="ov-stat-label">Total Cards</div>
+      <div class="ov-stat-val">{{ deck.total }}</div>
+    </div>
+  </div>
+  <div class="ov-stat-card">
+    <div class="ov-stat-icon green"><i data-lucide="sprout"></i></div>
+    <div>
+      <div class="ov-stat-label">New</div>
+      <div class="ov-stat-val">{{ deck.new }}</div>
+    </div>
+  </div>
+  <div class="ov-stat-card">
+    <div class="ov-stat-icon purple"><i data-lucide="graduation-cap"></i></div>
+    <div>
+      <div class="ov-stat-label">Learning</div>
+      <div class="ov-stat-val">{{ deck.learn }}</div>
+    </div>
+  </div>
+  <div class="ov-stat-card">
+    <div class="ov-stat-icon red"><i data-lucide="clock"></i></div>
+    <div>
+      <div class="ov-stat-label">To Review</div>
+      <div class="ov-stat-val">{{ deck.due }}</div>
+    </div>
+  </div>
+</div>
 
-{% block bottombar %}
-<div class="bottombar">
-  <a class="abtn" href="/quiz">Decks</a>
-  <a class="abtn" href="/quiz/add?deck={{ deck.name }}">Add</a>
-  <a class="abtn" href="/quiz/browse?deck={{ deck.name }}">Browse</a>
+<!-- Cards list -->
+<div class="ov-cards-section">
+  <div class="ov-cards-hd">
+    <div class="ov-cards-title-group">
+      <div class="ov-stat-icon blue" style="width:36px;height:36px;border-radius:8px">
+        <i data-lucide="layers"></i>
+      </div>
+      <div>
+        <div class="ov-cards-title">Cards</div>
+        <div class="ov-cards-sub">Review and manage cards in this deck.</div>
+      </div>
+    </div>
+    <div class="ov-cards-controls">
+      <div class="ov-search-wrap">
+        <i data-lucide="search" class="ov-search-icon"></i>
+        <input type="search" id="card-search" class="ov-search" placeholder="Search cards…" autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <div class="ov-card-list" id="card-list">
+    {% for c in cards %}
+    <div class="ov-card-row" data-q="{{ c.question|lower }}" data-id="{{ c.id }}">
+      <span class="ov-card-num">{{ loop.index }}</span>
+      <span class="ov-card-q">{{ c.question|truncate(80) }}</span>
+      <span class="ov-card-badge {% if c.due %}badge-due{% elif c.reps == 0 %}badge-new{% else %}badge-ok{% endif %}">
+        {% if c.due %}To Review{% elif c.reps == 0 %}New{% else %}OK{% endif %}
+      </span>
+      <div class="ov-card-menu">
+        <details class="menu up">
+          <summary title="Options">···</summary>
+          <div class="menu-items">
+            <a href="/quiz/cards/{{ c.id }}/edit">Edit</a>
+            <a href="/quiz/cards/{{ c.id }}">Info</a>
+            <button type="button" class="danger" data-delete="{{ c.id }}">Delete</button>
+          </div>
+        </details>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.addEventListener('keydown', function (e) {
-  var s = document.getElementById('study-now');
-  if (s && (e.key === 's' || e.key === 'Enter') && document.activeElement.tagName !== 'INPUT') location.href = s.href;
-});
+(function () {
+  var N = window.Notes;
+  // search filter
+  document.getElementById('card-search').addEventListener('input', function () {
+    var q = this.value.toLowerCase();
+    document.querySelectorAll('.ov-card-row').forEach(function (r) {
+      r.hidden = q && !r.dataset.q.includes(q);
+    });
+  });
+  // delete
+  document.querySelectorAll('[data-delete]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!confirm('Delete this card?')) return;
+      N.api('DELETE', '/api/cards/' + b.dataset.delete).then(function () {
+        b.closest('.ov-card-row').remove();
+      }).catch(function (e) { N.toast(e.message, true); });
+    });
+  });
+  // keyboard shortcut
+  document.addEventListener('keydown', function (e) {
+    var s = document.getElementById('study-now');
+    if (s && (e.key === 's' || e.key === 'Enter') && document.activeElement.tagName !== 'INPUT') location.href = s.href;
+  });
+  // close menus on outside click
+  document.addEventListener('click', function (e) {
+    document.querySelectorAll('details.menu[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
+  });
+})();
 </script>
 {% endblock %}
 
