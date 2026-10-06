@@ -4,18 +4,20 @@
 {% block bodyclass %}deckbrowser{% endblock %}
 
 {% block sidebar_stats %}
+{% set ns = namespace(due=0, new=0, learn=0) %}
+{% for d in decks %}{% set ns.due = ns.due + d.due %}{% set ns.new = ns.new + d.new %}{% set ns.learn = ns.learn + d.learn %}{% endfor %}
 <div class="sb-stats">
   <div class="sb-stat">
     <span class="sb-label">DUE</span>
-    <span class="due">{% set total_due = namespace(v=0) %}{% for d in decks %}{% set total_due.v = total_due.v + d.due %}{% endfor %}{{ total_due.v }}</span>
+    <span class="due">{{ ns.due + ns.new + ns.learn }}</span>
   </div>
   <div class="sb-stat">
     <span class="sb-label">NEW</span>
-    <span class="new">{% set total_new = namespace(v=0) %}{% for d in decks %}{% set total_new.v = total_new.v + d.new %}{% endfor %}{{ total_new.v }}</span>
+    <span class="new">{{ ns.new }}</span>
   </div>
   <div class="sb-stat">
     <span class="sb-label">LEARNING</span>
-    <span class="learn">{% set total_learn = namespace(v=0) %}{% for d in decks %}{% set total_learn.v = total_learn.v + d.learn %}{% endfor %}{{ total_learn.v }}</span>
+    <span class="learn">{{ ns.learn }}</span>
   </div>
 </div>
 {% endblock %}
