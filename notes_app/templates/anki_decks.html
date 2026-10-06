@@ -62,18 +62,6 @@
         .catch(function (e) { N.toast(e.message, true); });
     });
   });
-  // position fixed gear menus below their trigger
-  document.querySelectorAll('details.menu').forEach(function(d) {
-    d.addEventListener('toggle', function() {
-      if (d.open) {
-        var r = d.querySelector('summary').getBoundingClientRect();
-        var items = d.querySelector('.menu-items');
-        items.style.top = (r.bottom + 4) + 'px';
-        // keep it on screen horizontally
-        items.style.right = (window.innerWidth - r.right) + 'px';
-      }
-    });
-  });
   // close any open gear menu when clicking elsewhere
   document.addEventListener('click', function (e) {
     document.querySelectorAll('details.menu[open]').forEach(function (d) { if (!d.contains(e.target)) d.removeAttribute('open'); });
