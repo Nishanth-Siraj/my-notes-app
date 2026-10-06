@@ -532,8 +532,8 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
 
 /* ---------- review heatmap ---------- */
 :root {
-  --hm0: #161b22; --hm1: #5e3a0a; --hm2: #b45309; --hm3: #f97316; --hm4: #fb923c;
-  --hmf0: #161b22; --hmf1: #0c3358; --hmf2: #075985; --hmf3: #0284c7; --hmf4: #38bdf8;
+  --hm0: #21272f; --hm1: #5e3a0a; --hm2: #b45309; --hm3: #f97316; --hm4: #fb923c;
+  --hmf0: #1a2535; --hmf1: #0c3358; --hmf2: #075985; --hmf3: #0284c7; --hmf4: #38bdf8;
 }
 .heatmap-wrap { max-width: 100%; margin: 34px 0 0; }
 .hm-head { display: flex; justify-content: space-between; align-items: center; gap: 8px 12px; flex-wrap: wrap; margin-bottom: 8px; }
