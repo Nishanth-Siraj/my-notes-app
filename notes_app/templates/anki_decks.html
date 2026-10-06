@@ -32,7 +32,7 @@
 </table>
 </div>
 
-<p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% else %}No cards have been studied today.{% endif %}</p>
+<p class="studied">{% if stats.reviewed_today %}Studied {{ stats.reviewed_today }} card{{ '' if stats.reviewed_today == 1 else 's' }} today.{% elif stats.due > 0 %}<span class="due-badge">{{ stats.due }} card{{ '' if stats.due == 1 else 's' }} due</span> — click a deck to start reviewing.{% else %}No cards are due today.{% endif %}</p>
 
 <div class="deck-buttons">
   <button type="button" class="abtn" id="btn-create-deck">Create Deck</button>
@@ -60,6 +60,18 @@
       if (!confirm('Delete deck "' + n + '"' + (c ? ' and its ' + c + ' card' + (c === 1 ? '' : 's') : '') + '?')) return;
       N.api('DELETE', '/api/decks/' + encodeURIComponent(n)).then(function () { location.reload(); })
         .catch(function (e) { N.toast(e.message, true); });
+    });
+  });
+  // position fixed gear menus below their trigger
+  document.querySelectorAll('details.menu').forEach(function(d) {
+    d.addEventListener('toggle', function() {
+      if (d.open) {
+        var r = d.querySelector('summary').getBoundingClientRect();
+        var items = d.querySelector('.menu-items');
+        items.style.top = (r.bottom + 4) + 'px';
+        // keep it on screen horizontally
+        items.style.right = (window.innerWidth - r.right) + 'px';
+      }
     });
   });
   // close any open gear menu when clicking elsewhere

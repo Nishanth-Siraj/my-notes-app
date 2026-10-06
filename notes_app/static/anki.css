@@ -124,6 +124,7 @@ table.decks .gear { width: 32px; text-align: right; }
 .new { color: var(--new); } .learn { color: var(--learn); } .review { color: var(--review); }
 .zero { color: var(--fg-subtle); opacity: .6; }
 .studied { text-align: center; color: var(--fg-subtle); font-size: 13px; margin: 14px 0 18px; }
+.due-badge { color: var(--review); font-weight: 700; font-size: 15px; }
 .deck-buttons { display: flex; justify-content: center; gap: 10px; }
 
 /* gear / more menus */
@@ -131,11 +132,10 @@ details.menu { position: relative; display: inline-block; }
 details.menu > summary { list-style: none; cursor: pointer; color: var(--fg-subtle); font-size: 16px; padding: 0 4px; }
 details.menu > summary::-webkit-details-marker { display: none; }
 details.menu .menu-items {
-  position: absolute; right: 0; top: 100%; z-index: 20; min-width: 170px;
-  background: var(--canvas); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  position: fixed; right: 8px; z-index: 500; min-width: 170px;
+  background: var(--canvas); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.28);
   display: flex; flex-direction: column; padding: 4px 0; text-align: left;
 }
-details.menu.up .menu-items { top: auto; bottom: 100%; margin-bottom: 6px; }
 details.menu .menu-items a, details.menu .menu-items button {
   background: none; border: 0; color: var(--fg); font: inherit; font-size: 14px;
   padding: 7px 14px; text-align: left; cursor: pointer; display: flex; justify-content: space-between; gap: 12px;
