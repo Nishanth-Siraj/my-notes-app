@@ -73,6 +73,6 @@
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 {% block scripts %}{% endblock %}
 <script>if(window.lucide)lucide.createIcons();</script>
-<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/static/sw.js');</script>
+<script>if('caches' in window)caches.keys().then(function(k){k.forEach(function(n){caches.delete(n);});});if('serviceWorker' in navigator)navigator.serviceWorker.getRegistrations().then(function(r){r.forEach(function(x){x.unregister();});});</script>
 </body>
 </html>
