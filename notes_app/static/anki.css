@@ -483,12 +483,12 @@ hr#answer-sep, .qa.boxed hr { border: 0; border-top: 1px solid var(--border); ma
 .chk { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; }
 .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 6px; }
 table.browse { width: 100%; border-collapse: collapse; font-size: 13px; }
-table.browse th { text-align: left; font-weight: 600; background: var(--frame); padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-table.browse td { padding: 6px 8px; border-bottom: 1px solid var(--border); white-space: nowrap; }
-table.browse td.sf { white-space: normal; min-width: 240px; }
-table.browse tr.row { cursor: pointer; }
-table.browse tr.row:hover { background: var(--window); }
-table.browse tr.new td.sf { color: var(--new); } table.browse tr.learn td.sf { color: var(--learn); }
+table.browse th { text-align: left; font-weight: 600; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--fg-subtle); background: var(--window); padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+table.browse td { padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; color: var(--fg); }
+table.browse td.sf { white-space: normal; min-width: 260px; font-size: 13.5px; }
+table.browse tr.row { cursor: pointer; transition: background .1s; }
+table.browse tr.row:hover { background: rgba(255,255,255,.04); }
+table.browse tr.row:last-child td { border-bottom: none; }
 table.browse td.tags { color: var(--fg-subtle); }
 
 /* ---------- card info ---------- */
