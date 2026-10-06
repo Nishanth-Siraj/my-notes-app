@@ -30,6 +30,15 @@
 {% endblock %}
 
 {% block content %}
+<div class="ac-header">
+  <div class="ac-title-group">
+    <div class="ac-hero-icon"><i data-lucide="layers"></i></div>
+    <div>
+      <h1 class="ac-title">Decks</h1>
+      <p class="ac-subtitle">Pick a deck to study, or manage your collection</p>
+    </div>
+  </div>
+</div>
 <div class="panel panel-menus">
 <table class="decks" id="decks">
   <thead>
@@ -77,7 +86,7 @@
 
 <!-- Review heatmap -->
 <div class="panel" style="margin-top:16px">
-<section class="heatmap-wrap" id="heatmap" data-days="365" data-today-due="{{ ns.due + ns.learn }}"></section>
+<section class="heatmap-wrap" id="heatmap" style="margin-top:0" data-days="365" data-today-due="{{ ns.due + ns.learn }}"></section>
 </div>
 {% endblock %}
 
