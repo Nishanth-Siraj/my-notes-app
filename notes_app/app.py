@@ -333,7 +333,9 @@ def search_suggest(q: str = "", db: Session = Depends(get_db)):
 
 def render(request: Request, name: str, **ctx):
     ctx.setdefault("has_password", bool(PASSWORD))
-    return templates.TemplateResponse(request, name, ctx)
+    resp = templates.TemplateResponse(request, name, ctx)
+    resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 def fmt(dt: datetime.datetime) -> str:
