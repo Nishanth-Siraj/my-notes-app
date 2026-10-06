@@ -740,15 +740,9 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
   .br-search-wrap { min-width: 0; width: 100%; }
   .br-chk { order: 3; }
   .br-search-bar .abtn { order: 4; width: 100%; justify-content: center; }
-  /* hide less-important browse columns on mobile */
-  .br-table-panel table.browse th:nth-child(4),
-  .br-table-panel table.browse td:nth-child(4),
-  .br-table-panel table.browse th:nth-child(5),
-  .br-table-panel table.browse td:nth-child(5),
-  .br-table-panel table.browse th:nth-child(6),
-  .br-table-panel table.browse td:nth-child(6),
-  .br-table-panel table.browse th:nth-child(7),
-  .br-table-panel table.browse td:nth-child(7) { display: none; }
+  /* horizontal scroll for browse table on mobile */
+  .br-table-panel { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .br-table-panel table.browse { min-width: 620px; }
 
   /* add card */
   .ac-fields { grid-template-columns: 1fr; }
