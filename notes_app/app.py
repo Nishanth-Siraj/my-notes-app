@@ -135,7 +135,7 @@ app.add_middleware(
     SessionMiddleware, secret_key=SECRET, max_age=30 * 24 * 3600, same_site="lax"
 )
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
-templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"), auto_reload=True)
 
 
 class NotLoggedIn(Exception):
