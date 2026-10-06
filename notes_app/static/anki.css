@@ -644,7 +644,7 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
 /* ---------- panel card ---------- */
 .panel {
   background: var(--canvas); border: 1px solid var(--border);
-  border-radius: 12px; padding: 20px 22px; overflow: visible;
+  border-radius: 12px; padding: 20px 22px; overflow: hidden;
 }
 
 /* deck mini icon in table */
@@ -723,9 +723,9 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
   /* deck overview + stat cards */
   .ov-hero { flex-direction: column; align-items: flex-start; gap: 12px; }
   .ov-hero-actions { flex-wrap: wrap; gap: 8px; }
-  .ov-stats { grid-template-columns: repeat(2, 1fr); }
-  .ov-stat-card { padding: 12px; gap: 10px; }
-  .ov-stat-icon { width: 36px; height: 36px; border-radius: 8px; }
+  .ov-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .ov-stat-card { padding: 12px 10px; gap: 10px; min-width: 0; max-width: 100%; box-sizing: border-box; }
+  .ov-stat-icon { width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0; }
   .ov-stat-icon i { width: 18px; height: 18px; }
   .ov-stat-val { font-size: 1.4rem; }
   .ov-cards-hd { flex-direction: column; gap: 10px; }
