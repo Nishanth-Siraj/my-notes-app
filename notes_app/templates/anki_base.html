@@ -128,5 +128,15 @@ if ('serviceWorker' in navigator) {
   });
 }
 </script>
+<script>
+// Phones restore tabs from memory; refetch so new data always shows
+window.addEventListener('pageshow', function (e) { if (e.persisted && !document.querySelector('textarea, [contenteditable], body.reviewer')) location.reload(); });
+(function () { var hiddenAt = 0;
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) hiddenAt = Date.now();
+    else if (hiddenAt && Date.now() - hiddenAt > 60000 && !document.querySelector('textarea, [contenteditable], body.reviewer')) location.reload();
+  });
+})();
+</script>
 </body>
 </html>
