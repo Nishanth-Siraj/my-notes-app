@@ -135,6 +135,15 @@ app.add_middleware(
     SessionMiddleware, secret_key=SECRET, max_age=30 * 24 * 3600, same_site="lax"
 )
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
+
+
+@app.middleware("http")
+async def revalidate_static(request: Request, call_next):
+    # Browsers must recheck static files (cheap ETag hit) so a deploy is never masked by a stale JS/CSS copy
+    resp = await call_next(request)
+    if request.url.path.startswith("/static/"):
+        resp.headers["Cache-Control"] = "no-cache"
+    return resp
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 templates.env.auto_reload = True
 
