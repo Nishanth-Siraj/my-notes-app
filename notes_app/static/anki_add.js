@@ -95,6 +95,13 @@
     });
   });
 
+  function closePreviews() {
+    document.querySelectorAll('.ac-card[data-field]').forEach(function (sec) {
+      sec.querySelector('.preview').hidden = true;
+      sec.querySelector('[data-act="preview"]').classList.remove('active');
+    });
+  }
+
   // ---------------- tag chips
   var tagsInput = $('tags');           // hidden, comma-joined
   var tagInput = $('tag-input');       // visible text input
@@ -143,7 +150,7 @@
   // ---------------- clear button
   $('btn-clear').addEventListener('click', function () {
     $('question').value = ''; $('answer').value = '';
-    tags = []; syncTags();
+    tags = []; syncTags(); closePreviews();
     $('question').focus();
   });
 
@@ -166,11 +173,14 @@
       remember(c.deck);
       if (cardId) { location.href = '/quiz/cards/' + c.id; return; }
       $('question').value = ''; $('answer').value = '';
+      closePreviews();
       $('question').focus();
       N.toast('Card added to ' + c.deck);
     }).catch(function (e) { N.toast('Could not save: ' + e.message, true); })
       .finally(function () { saving = false; });
   }
+  // Keep focus where it is so blur-driven layout shifts can't swallow the first click
+  ['mousedown', 'pointerdown'].forEach(function (ev) { $('btn-save').addEventListener(ev, function (e) { e.preventDefault(); }); });
   $('btn-save').addEventListener('click', save);
   document.addEventListener('keydown', function (e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); save(); }
