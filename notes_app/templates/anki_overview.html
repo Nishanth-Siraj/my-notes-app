@@ -95,9 +95,15 @@
     </div>
   </div>
 
+  <div class="ov-move-bar" id="move-bar" hidden>
+    <span id="move-count">0 selected</span>
+    <button type="button" class="abtn primary" id="move-selected"><i data-lucide="folder-input" class="btn-icon"></i>Move to deck</button>
+    <button type="button" class="abtn" id="move-clear">Clear</button>
+  </div>
   <div class="ov-card-list" id="card-list">
     {% for c in cards %}
     <div class="ov-card-row" data-q="{{ c.question|lower }}" data-id="{{ c.id }}">
+      <input type="checkbox" class="ov-card-chk" value="{{ c.id }}" aria-label="Select card">
       <span class="ov-card-num">{{ loop.index }}</span>
       <span class="ov-card-q">{{ c.question|truncate(80) }}</span>
       <span class="ov-card-badge {% if c.due %}badge-due{% elif c.reps == 0 %}badge-new{% else %}badge-ok{% endif %}">
@@ -109,6 +115,7 @@
           <div class="menu-items">
             <a href="/quiz/cards/{{ c.id }}/edit">Edit</a>
             <a href="/quiz/cards/{{ c.id }}">Info</a>
+            <button type="button" data-move="{{ c.id }}">Move to deck…</button>
             <button type="button" class="danger" data-delete="{{ c.id }}">Delete</button>
           </div>
         </details>
@@ -117,6 +124,20 @@
     {% endfor %}
   </div>
 </div>
+<dialog class="move-dlg" id="move-dlg">
+  <form method="dialog" id="move-form">
+    <h3 class="move-title">Move <span id="move-dlg-count">1 card</span> to deck</h3>
+    <select id="move-deck" class="ac-deck-sel">
+      {% for d in decks if d != deck.name %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+      <option value="__new__">+ New deck…</option>
+    </select>
+    <input type="text" id="move-new" class="move-new" placeholder="New deck name" hidden>
+    <div class="move-actions">
+      <button type="button" class="abtn" id="move-cancel">Cancel</button>
+      <button type="submit" class="abtn primary" id="move-go">Move</button>
+    </div>
+  </form>
+</dialog>
 {% endblock %}
 
 {% block scripts %}
@@ -139,6 +160,39 @@
       }).catch(function (e) { N.toast(e.message, true); });
     });
   });
+  // move cards to another deck
+  var dlg = document.getElementById('move-dlg'), sel = document.getElementById('move-deck'), newIn = document.getElementById('move-new');
+  var bar = document.getElementById('move-bar'), pending = [];
+  function checked() { return Array.prototype.map.call(document.querySelectorAll('.ov-card-chk:checked'), function (c) { return c.value; }); }
+  function syncBar() { var n = checked().length; bar.hidden = !n; document.getElementById('move-count').textContent = n + ' selected'; }
+  function toggleNew() { newIn.hidden = sel.value !== '__new__'; if (!newIn.hidden) newIn.focus(); }
+  function openMove(ids) {
+    pending = ids;
+    document.getElementById('move-dlg-count').textContent = ids.length + ' card' + (ids.length === 1 ? '' : 's');
+    newIn.value = ''; toggleNew(); dlg.showModal();
+  }
+  document.querySelectorAll('.ov-card-chk').forEach(function (c) { c.addEventListener('change', syncBar); });
+  document.getElementById('move-clear').addEventListener('click', function () { document.querySelectorAll('.ov-card-chk').forEach(function (c) { c.checked = false; }); syncBar(); });
+  document.getElementById('move-selected').addEventListener('click', function () { openMove(checked()); });
+  document.querySelectorAll('[data-move]').forEach(function (b) { b.addEventListener('click', function () { b.closest('details').removeAttribute('open'); openMove([b.dataset.move]); }); });
+  sel.addEventListener('change', toggleNew);
+  document.getElementById('move-cancel').addEventListener('click', function () { dlg.close(); });
+  document.getElementById('move-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var target = sel.value === '__new__' ? newIn.value.trim() : sel.value;
+    if (!target) { N.toast('Enter a deck name', true); return; }
+    var go = document.getElementById('move-go'); go.disabled = true;
+    Promise.all(pending.map(function (id) { return N.api('PUT', '/api/cards/' + id, { deck: target }); }))
+      .then(function () {
+        pending.forEach(function (id) { var r = document.querySelector('.ov-card-row[data-id="' + id + '"]'); if (r) r.remove(); });
+        dlg.close(); syncBar();
+        N.toast('Moved ' + pending.length + ' card' + (pending.length === 1 ? '' : 's') + ' to ' + target);
+        setTimeout(function () { location.reload(); }, 900);
+      })
+      .catch(function (err) { N.toast('Move failed: ' + err.message, true); })
+      .finally(function () { go.disabled = false; });
+  });
+
   // keyboard shortcut
   document.addEventListener('keydown', function (e) {
     var s = document.getElementById('study-now');

@@ -1043,3 +1043,16 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
 @media (max-width: 768px) { .rv-bar .rv-btn { font-size: 15px; } .rv-bar #btn-next:not(:disabled) { font-size: 17px; } }
 @media (max-width: 768px) { .rv-bar .rv-btn svg { flex-shrink: 0; width: 22px; height: 22px; } .rv-bar .rv-btn { padding: 15px 4px; gap: 6px; } .rv-bar .counts { font-size: 17px; } }
 .panel.panel-menus { overflow: visible; }
+
+/* move cards between decks */
+.ov-card-chk { width: 17px; height: 17px; accent-color: var(--btn-primary); flex-shrink: 0; cursor: pointer; }
+.ov-move-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 20px; background: rgba(79,70,229,.12); border-bottom: 1px solid var(--border); font-size: 14px; }
+.ov-move-bar[hidden] { display: none; }
+.ov-move-bar span { margin-right: auto; color: var(--fg); font-weight: 600; }
+.move-dlg { background: var(--window); color: var(--fg); border: 1px solid var(--border); border-radius: 14px; padding: 22px; width: min(420px, calc(100vw - 32px)); }
+.move-dlg::backdrop { background: rgba(0,0,0,.6); }
+.move-title { margin: 0 0 16px; font-size: 17px; }
+.move-dlg .ac-deck-sel { width: 100%; padding: 10px 32px 10px 12px; font-size: 15px; }
+.move-new { width: 100%; margin-top: 10px; font: inherit; font-size: 15px; color: var(--fg); background: var(--frame); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; outline: none; }
+.move-new:focus { border-color: var(--btn-primary); }
+.move-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }

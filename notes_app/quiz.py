@@ -530,7 +530,7 @@ def overview_page(request: Request, name: str, db: Session = Depends(get_db)):
         raise HTTPException(404, "deck not found")
     cards = db.query(Card).filter(Card.deck == name).order_by(Card.due_at.asc()).all()
     cards_out = [card_out(c) for c in cards]
-    return render(request, "anki_overview.html", deck=row, cards=cards_out, nav="quiz")
+    return render(request, "anki_overview.html", deck=row, cards=cards_out, decks=[d["name"] for d in deck_counts(db)], nav="quiz")
 
 
 @router.get("/quiz/review", response_class=HTMLResponse)
