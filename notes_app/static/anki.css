@@ -2,18 +2,18 @@
 
 /* ---------- always-dark design tokens ---------- */
 :root {
-  --bg: #0d0f14;
-  --sidebar-bg: #111318;
-  --canvas: #161b22;
-  --window: #1c2128;
-  --frame: #21262d;
-  --border: #30363d;
-  --fg: #e2e4e9;
-  --fg-subtle: #7d8590;
+  --bg: #111827;
+  --sidebar-bg: #1f2937;
+  --canvas: #1f2937;
+  --window: #1f2937;
+  --frame: #374151;
+  --border: #374151;
+  --fg: #f3f4f6;
+  --fg-subtle: #9ca3af;
   --link: #79c0ff;
-  --btn-bg: #21262d;
-  --btn-bg-hover: #30363d;
-  --btn-border: #363c45;
+  --btn-bg: #374151;
+  --btn-bg-hover: #4b5563;
+  --btn-border: #4b5563;
   --btn-primary: #4f46e5;
   --new: #5c8cff;
   --learn: #a78bfa;
@@ -22,7 +22,7 @@
   --hard: #f59e0b;
   --good: #22c55e;
   --easy: #38bdf8;
-  --code-bg: #161b22;
+  --code-bg: #111827;
   --shadow: 0 2px 8px rgba(0,0,0,.5);
   --sb-width: 240px;
   --accent: #4f46e5;
@@ -534,7 +534,7 @@ table.log td { padding: 4px 10px; border-bottom: 1px solid var(--border); }
 
 /* ---------- review heatmap ---------- */
 :root {
-  --hm0: #21272f; --hm1: #5e3a0a; --hm2: #b45309; --hm3: #f97316; --hm4: #fb923c;
+  --hm0: #374151; --hm1: #5e3a0a; --hm2: #b45309; --hm3: #f97316; --hm4: #fb923c;
   --hmf0: #1a2535; --hmf1: #0c3358; --hmf2: #075985; --hmf3: #0284c7; --hmf4: #38bdf8;
 }
 .heatmap-wrap { max-width: 100%; margin: 34px 0 0; }
@@ -603,7 +603,7 @@ table.decks, table.overview-counts, table.info, table.log, table.counts-table { 
 
   .bottom-nav {
     display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-    background: #111318;
+    background: #1f2937;
     border-top: 1px solid var(--border);
     padding: 6px 0 max(6px, env(safe-area-inset-bottom));
   }
@@ -854,10 +854,10 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   .rv-top { display: none; }
   body.reviewer .anki-main { padding-top: 16px; }
   .rv-progress-row { margin-bottom: 20px; }
-  .rv-progress { height: 14px; background: #1e2638; }
+  .rv-progress { height: 14px; background: #374151; }
   .rv-progress-fill { background: #2f6bff; }
   .rv-progress-txt { font-size: 15px; }
-  .rv-card { min-height: 52vh; background: #111827; border-color: #2c3a5c; border-radius: 16px; }
+  .rv-card { min-height: 52vh; background: #111827; border-color: #4b5563; border-radius: 16px; }
   .rv-star { color: #9fb4ff; }
 
   .rv-bar.bottombar {
@@ -885,12 +885,12 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
 
   .rv-btn {
     flex-direction: column; gap: 6px; padding: 12px 6px; font-size: 13px;
-    border-radius: 12px; background: #141a26; border-color: #2a3346; min-width: 0;
+    border-radius: 12px; background: #1f2937; border-color: #4b5563; min-width: 0;
   }
   .rv-btn span, .rv-bar details.menu > summary span { display: inline; }
   .rv-btn i { width: 22px; height: 22px; }
   .rv-bar #btn-next { background: #dbe4ff; border-color: transparent; color: #2f5bff; }
-  .rv-bar #btn-next:disabled { background: #141a26; border-color: #2a3346; color: var(--fg); }
+  .rv-bar #btn-next:disabled { background: #1f2937; border-color: #4b5563; color: var(--fg); }
   .rv-bar .answer-buttons .abtn { padding: 14px 4px; border-radius: 12px; }
   body.reviewer .anki-main.with-bottombar { padding-bottom: 250px; }
 }
@@ -931,7 +931,7 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   .rv-bar .answer-buttons { gap: 8px; }
   .rv-bar .answer-buttons .abtn { padding: 12px 2px; font-size: 13px; }
   .rv-bar .answer-buttons .abtn i { width: 22px; height: 22px; }
-  .rv-bar #btn-next:disabled { background: #141a26; color: var(--fg-subtle); }
+  .rv-bar #btn-next:disabled { background: #1f2937; color: var(--fg-subtle); }
   .rv-bar #btn-next:not(:disabled) { flex-direction: row; gap: 10px; font-size: 16px; }
 }
 @media (max-width: 768px) { body.reviewer .anki-main.with-bottombar { padding-bottom: 300px; } .rv-card { min-height: 0; } }
@@ -942,15 +942,15 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
 @media (max-width: 768px) {
   .rv-card-body { padding: 36px 8px 24px; }
   .rv-card #question { font-weight: 400; font-size: 30px; line-height: 1.45; }
-  .rv-card .card-content img { display: block; margin: 28px auto 8px; max-width: 100%; border-radius: 12px; border: 1px solid #2c3a5c; }
+  .rv-card .card-content img { display: block; margin: 28px auto 8px; max-width: 100%; border-radius: 12px; border: 1px solid #4b5563; }
   .rv-bar .show-answer { width: 72%; border-radius: 999px; padding: 18px 56px; font-size: 18px; font-weight: 500; }
   .rv-show-go { display: flex; background: none; width: auto; height: auto; right: 22px; }
   .rv-show-go i { width: 22px; height: 22px; }
   .rv-bar .bar-center { margin-bottom: 20px; }
   .rv-btn { padding: 16px 6px; font-size: 15px; border-radius: 14px; gap: 8px; }
   .rv-btn i { width: 24px; height: 24px; }
-  .rv-bar #btn-next:disabled { background: #141a26; color: var(--fg-subtle); opacity: .55; }
-  .rv-bar .counts { border: 1px solid #2a3346; border-radius: 999px; padding: 8px 14px; font-size: 17px; justify-self: end; }
+  .rv-bar #btn-next:disabled { background: #1f2937; color: var(--fg-subtle); opacity: .55; }
+  .rv-bar .counts { border: 1px solid #4b5563; border-radius: 999px; padding: 8px 14px; font-size: 17px; justify-self: end; }
   body.reviewer .anki-main.with-bottombar { padding-bottom: 320px; }
 }
 @media (max-width: 768px) { .rv-bar .show-answer { display: flex; margin: 0 auto; } .rv-bar .show-answer[hidden] { display: none; } }
@@ -973,15 +973,15 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   .rv-card-body { padding: 56px 0 24px; }
   .rv-card #question { font-size: 32px; font-weight: 400; line-height: 1.45; }
   .rv-card .card-content p { max-width: 780px; margin-left: auto; margin-right: auto; }
-  .rv-card .card-content img { display: block; margin: 40px auto 8px; max-width: 100%; max-height: 52vh; border-radius: 14px; border: 1px solid #2c3a5c; }
+  .rv-card .card-content img { display: block; margin: 40px auto 8px; max-width: 100%; max-height: 52vh; border-radius: 14px; border: 1px solid #4b5563; }
 
   .rv-bar.bottombar {
     left: var(--sb-width); right: 0; bottom: 0;
-    background: #141821; backdrop-filter: none;
+    background: #1f2937; backdrop-filter: none;
     border: 0; border-top: 1px solid var(--border); border-radius: 0;
     padding: 24px;
   }
-  .rv-btn, .rv-bar details.menu > summary { padding: 15px 24px; font-size: 18px; gap: 14px; border-radius: 10px; background: transparent; border-color: #343b48; }
+  .rv-btn, .rv-bar details.menu > summary { padding: 15px 24px; font-size: 18px; gap: 14px; border-radius: 10px; background: transparent; border-color: #4b5563; }
   .rv-btn span { display: inline; }
   .rv-btn i { width: 24px; height: 24px; }
   .rv-bar .bar-right { gap: 24px; }
@@ -1017,14 +1017,14 @@ body.reviewer .anki-main.with-bottombar { padding-bottom: 150px; }
   .rv-progress-fill { background: #4a5cf5; }
 
   .rv-bar .show-answer, .rv-bar .show-answer:hover {
-    background: #161b26; color: var(--fg); border: 1.5px solid #3a4253;
+    background: #1f2937; color: var(--fg); border: 1.5px solid #4b5563;
     width: 66%; padding: 18px 24px; font-size: 20px; font-weight: 400;
   }
   .rv-bar .show-answer i { width: 28px; height: 28px; }
   .rv-show-go { display: none; }
 
   .rv-bar.bottombar { grid-template-columns: 1.15fr 1fr 1.25fr auto; gap: 14px; }
-  .rv-btn { flex-direction: row; gap: 10px; padding: 16px 8px; font-size: 16px; border-radius: 10px; background: transparent; border: 1.5px solid #343b48; }
+  .rv-btn { flex-direction: row; gap: 10px; padding: 16px 8px; font-size: 16px; border-radius: 10px; background: transparent; border: 1.5px solid #4b5563; }
   .rv-bar #btn-next { flex-direction: row-reverse; }
   .rv-bar #btn-next:not(:disabled) { background: #7fdcb3; color: #0b2e22; border-color: transparent; font-size: 18px; }
   .rv-bar #btn-next:disabled { background: transparent; }
