@@ -7,6 +7,14 @@
   var cardId = card.id || null;
   var deckSel = $('deck');
 
+  // New cards go to the deck used last time unless the URL names one
+  var KEY = 'azazel:lastDeck';
+  function remember(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+  if (!cardId && !new URLSearchParams(location.search).get('deck')) {
+    var saved = null; try { saved = localStorage.getItem(KEY); } catch (e) {}
+    if (saved && Array.prototype.some.call(deckSel.options, function (o) { return o.value === saved; })) deckSel.value = saved;
+  }
+
   // "New deck…" option
   var lastDeck = deckSel.value;
   deckSel.addEventListener('change', function () {
@@ -155,10 +163,11 @@
     var body = { question: question, answer: $('answer').value, tags: tagsInput.value, deck: deckSel.value };
     var req = cardId ? N.api('PUT', '/api/cards/' + cardId, body) : N.api('POST', '/api/cards', body);
     req.then(function (c) {
+      remember(c.deck);
       if (cardId) { location.href = '/quiz/cards/' + c.id; return; }
       $('question').value = ''; $('answer').value = '';
       $('question').focus();
-      N.toast('Card added!');
+      N.toast('Card added to ' + c.deck);
     }).catch(function (e) { N.toast('Could not save: ' + e.message, true); })
       .finally(function () { saving = false; });
   }
